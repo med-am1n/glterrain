@@ -1,4 +1,4 @@
-#opengl-init
+# opengl-init
 
 
 ## future use refrence, 
@@ -30,4 +30,4 @@ i may forget, nah sure i will so :
                 "${workspaceFolder}/includes",
                 "${workspaceFolder}/external/glm",
                 "/opt/homebrew/include"
-            ],
+            ], 
