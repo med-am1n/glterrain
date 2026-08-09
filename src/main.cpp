@@ -14,7 +14,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-GLFWwindow *createWindow(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb);
+GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb);
 bool loadAndCreateTexture(unsigned int &texture, const char *path, GLint wrap_s, GLint wrap_t, GLint min_filter, GLint mag_filter, bool verticalFlip);
 
 // settings
@@ -33,11 +33,13 @@ int main()
 
     glfwInit();
 
-    GLFWwindow *window = createWindow(
+    GLFWwindow *window = startGLFW(
         SCR_WIDTH, SCR_HEIGHT, "OpenGL",
         framebuffer_size_callback,
         mouse_callback,
         scroll_callback);
+
+        processInput(window);
 
     if (!window)
         return -1;
@@ -206,7 +208,7 @@ bool loadAndCreateTexture(unsigned int &texture, const char *path, GLint wrap_s,
     return true;
 }
 
-GLFWwindow *createWindow(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb)
+GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb)
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
