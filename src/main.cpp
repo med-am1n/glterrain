@@ -22,7 +22,8 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-glm::vec3 lighPos = glm::vec3(1.2f, 1.0f, 2.0f);
+glm::vec3 lighPosInit = glm::vec3(0.0f, 2.0f, 0.0f);
+glm::vec3 lighPos = lighPosInit;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -179,7 +180,7 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         float angle = 45.0f;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+        //model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -189,7 +190,7 @@ int main()
         lightShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
+        model = glm::translate(model, lighPosInit);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lighPos = glm::vec3(model[3]);
         lightShader.setMat4("model", model);
