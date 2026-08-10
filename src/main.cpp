@@ -115,7 +115,7 @@ int main()
     glEnableVertexAttribArray(1);
     // normal vector
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *)(5 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     // load and create a texture
     unsigned int texture1;
