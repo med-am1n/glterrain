@@ -26,6 +26,9 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 int main()
 {
 
@@ -39,7 +42,6 @@ int main()
         mouse_callback,
         scroll_callback);
 
-    processInput(window);
 
     if (!window)
         return -1;
@@ -141,6 +143,9 @@ int main()
     // render loop
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         // input
         processInput(window);
 
@@ -154,12 +159,12 @@ int main()
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
-        
 
         ourShader.use();
-        ourShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);;
+        ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        ;
         ourShader.setVec3("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
-        ourShader.setVec3("viewPos", camera.Position); 
+        ourShader.setVec3("viewPos", camera.Position);
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
@@ -268,6 +273,15 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
