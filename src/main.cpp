@@ -122,7 +122,7 @@ int main()
 
     // load and create a texture
     unsigned int texture1;
-    loadAndCreateTexture(texture1, FileSystem::getPath("resources/textures/container.jpg").c_str(),
+    loadAndCreateTexture(texture1, FileSystem::getPath("resources/textures/container2.png").c_str(),
                          GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, true);
 
     // light source
