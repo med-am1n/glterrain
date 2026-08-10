@@ -22,6 +22,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+glm::vec3 lighPos = glm::vec3(1.2f, 1.0f, 2.0f);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -163,7 +164,7 @@ int main()
         ourShader.use();
         ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         ;
-        ourShader.setVec3("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+        ourShader.setVec3("lightPos", lighPos);
         ourShader.setVec3("viewPos", camera.Position);
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -187,7 +188,7 @@ int main()
         lightShader.setMat4("projection", projection);
         lightShader.setMat4("view", view);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
+        model = glm::translate(model, lighPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightShader.setMat4("model", model);
 
