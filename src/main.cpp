@@ -121,14 +121,12 @@ int main()
     glEnableVertexAttribArray(2);
 
     // load and create a texture
-    unsigned int texture1, texture2;
-    loadAndCreateTexture(texture1, FileSystem::getPath("resources/textures/container2.png").c_str(),
+    unsigned int diffuseMap, specularMap;
+    loadAndCreateTexture(diffuseMap, FileSystem::getPath("resources/textures/container2.png").c_str(),
                          GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, true);
-    loadAndCreateTexture(texture2, FileSystem::getPath("resources/textures/container2_specular.png").c_str(),
+    loadAndCreateTexture(specularMap, FileSystem::getPath("resources/textures/container2_specular.png").c_str(),
                          GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, true);
 
-    std::cout << "diffuse ID: " << texture1 << "\n";
-std::cout << "specular ID: " << texture2 << "\n";
     // light source
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
@@ -164,9 +162,9 @@ std::cout << "specular ID: " << texture2 << "\n";
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
 
         ourShader.use();
         ourShader.setVec3("viewPos", camera.Position);
