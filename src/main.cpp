@@ -188,8 +188,10 @@ int main()
         lightShader.setMat4("projection", projection);
         lightShader.setMat4("view", view);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, lighPos);
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        lighPos = glm::vec3(model[3]);
         lightShader.setMat4("model", model);
 
         glBindVertexArray(lightCubeVAO);
