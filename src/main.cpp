@@ -159,6 +159,7 @@ int main()
         ourShader.use();
         ourShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);;
         ourShader.setVec3("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+        ourShader.setVec3("viewPos", camera.Position); 
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
