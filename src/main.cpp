@@ -169,7 +169,7 @@ int main()
         ourShader.use();
         ourShader.setVec3("viewPos", camera.Position);
         ourShader.setVec3("light.position", lightPos);
-        ourShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        ourShader.setVec3("light.direction", camera.Front);
         // material properties
         ourShader.setFloat("material.shininess", 64.0f);
         // light source properties

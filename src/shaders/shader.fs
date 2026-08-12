@@ -79,8 +79,9 @@ vec4 spotLight(){
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoord));
 
-	float angle = dot (light.position, lightDir);
-	float inten = clamp((angle - outerCone)/ (innerCone - outerCone), 0.0f, 1.0f);
+	float angle = dot(lightDir, normalize(-light.direction));
+	float epsilon = innerCone - outerCone;
+	float inten = clamp((angle - outerCone)/ epsilon, 0.0f, 1.0f);
 	return vec4(ambient + diffuse * inten + specular * inten, 1.0);
 
 }
