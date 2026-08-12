@@ -22,7 +22,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-glm::vec3 lightPosInit = glm::vec3(0.0f, 2.0f, 0.0f);
+glm::vec3 lightPosInit = glm::vec3(1.0f, 1.0f, 0.0f);
 glm::vec3 lightPos = lightPosInit;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -169,6 +169,7 @@ int main()
         ourShader.use();
         ourShader.setVec3("viewPos", camera.Position);
         ourShader.setVec3("light.position", lightPos);
+        ourShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         // material properties
         ourShader.setFloat("material.shininess", 64.0f);
         // light source properties
@@ -198,7 +199,7 @@ int main()
         lightShader.setMat4("projection", projection);
         lightShader.setMat4("view", view);
         model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, lightPosInit);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightPos = glm::vec3(model[3]);
