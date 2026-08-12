@@ -16,6 +16,9 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+	float a;
+	float b;
+	float c;
 };
  
 
@@ -27,9 +30,7 @@ vec4 pointLight(){
 
 	vec3 lightVec=light.position - FragPos;
 	float dist = length(lightVec);
-	float a=0.1;
-	float b=0.7;
-	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
+	float inten = 1.0f / (light.a * dist * dist + light.b * dist + light.c);
 	// ambient
     vec3 ambient = light.ambient * texture(material.diffuse, TexCoord).rgb;
 	// diffuse
