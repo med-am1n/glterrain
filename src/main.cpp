@@ -5,6 +5,7 @@
 #include "camera.h"
 #include <stb_image.h>
 #include <filesystem.h>
+#include <mesh.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -38,8 +39,7 @@ int main()
 
     glfwInit();
 
-    GLFWwindow *window = startGLFW(
-        SCR_WIDTH, SCR_HEIGHT, "OpenGL",
+    GLFWwindow *window = startGLFW(SCR_WIDTH, SCR_HEIGHT, "OpenGL",
         framebuffer_size_callback,
         mouse_callback,
         scroll_callback);
@@ -54,93 +54,293 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    Shader ourShader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
+    Shader cubeShader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
     Shader lightShader("../src/shaders/shader.vs", "../src/shaders/lightShader.fs");
 
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    std::vector<Vertex> vertices = {
+        {glm::vec3(-0.5f, -0.5f, -0.5f), // Position
+         glm::vec3(0.0f, 0.0f, -1.0f),   // Normal
+         glm::vec2(0.0f, 0.0f),          // TexCoords
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, -0.5f),
+         glm::vec3(0.0f, 0.0f, -1.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, -0.5f),
+         glm::vec3(0.0f, 0.0f, -1.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, -0.5f),
+         glm::vec3(0.0f, 0.0f, -1.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, -0.5f),
+         glm::vec3(0.0f, 0.0f, -1.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, -0.5f),
+         glm::vec3(0.0f, 0.0f, -1.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        // +Z
+        {
+            glm::vec3(-0.5f, -0.5f, 0.5f),
+            glm::vec3(0.0f, 0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec3(0.0f),
+            glm::vec3(0.0f),
+            {-1, -1, -1, -1},
+            {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, 0.5f),
+         glm::vec3(0.0f, 0.0f, 1.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 0.0f, 1.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 0.0f, 1.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 0.0f, 1.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, 0.5f),
+         glm::vec3(0.0f, 0.0f, 1.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
 
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        // -X
+        {
+            glm::vec3(-0.5f, 0.5f, 0.5f),
+            glm::vec3(-1.0f, 0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec3(0.0f),
+            glm::vec3(0.0f),
+            {-1, -1, -1, -1},
+            {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, -0.5f),
+         glm::vec3(-1.0f, 0.0f, 0.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, -0.5f),
+         glm::vec3(-1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, -0.5f),
+         glm::vec3(-1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, 0.5f),
+         glm::vec3(-1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, 0.5f),
+         glm::vec3(-1.0f, 0.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        // +X
+        {
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec3(0.0f),
+            glm::vec3(0.0f),
+            {-1, -1, -1, -1},
+            {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, -0.5f),
+         glm::vec3(1.0f, 0.0f, 0.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, -0.5f),
+         glm::vec3(1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, -0.5f),
+         glm::vec3(1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, 0.5f),
+         glm::vec3(1.0f, 0.0f, 0.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, 0.5f),
+         glm::vec3(1.0f, 0.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
 
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+        // -Y
+        {
+            glm::vec3(-0.5f, -0.5f, -0.5f),
+            glm::vec3(0.0f, -1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec3(0.0f),
+            glm::vec3(0.0f),
+            {-1, -1, -1, -1},
+            {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, -0.5f),
+         glm::vec3(0.0f, -1.0f, 0.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, 0.5f),
+         glm::vec3(0.0f, -1.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, -0.5f, 0.5f),
+         glm::vec3(0.0f, -1.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, 0.5f),
+         glm::vec3(0.0f, -1.0f, 0.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, -0.5f, -0.5f),
+         glm::vec3(0.0f, -1.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+        // +Y
+        {
+            glm::vec3(-0.5f, 0.5f, -0.5f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec3(0.0f),
+            glm::vec3(0.0f),
+            {-1, -1, -1, -1},
+            {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, -0.5f),
+         glm::vec3(0.0f, 1.0f, 0.0f),
+         glm::vec2(1.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 1.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 1.0f, 0.0f),
+         glm::vec2(1.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, 0.5f),
+         glm::vec3(0.0f, 1.0f, 0.0f),
+         glm::vec2(0.0f, 0.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}},
+        {glm::vec3(-0.5f, 0.5f, -0.5f),
+         glm::vec3(0.0f, 1.0f, 0.0f),
+         glm::vec2(0.0f, 1.0f),
+         glm::vec3(0.0f),
+         glm::vec3(0.0f),
+         {-1, -1, -1, -1},
+         {0, 0, 0, 0}}};
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    std::vector<Texture *> textures;
+    Texture diffuseTexture(
+        FileSystem::getPath("resources/textures/container2.png").c_str(), "texture_diffuse", 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    Texture specularTexture(
+        FileSystem::getPath("resources/textures/container2_specular.png").c_str(), "texture_specular", 1);
 
-    int stride = 8 * sizeof(float);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // normal vector
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    diffuseTexture.texUnit(cubeShader, "material.diffuse");
+    specularTexture.texUnit(cubeShader, "material.specular");
 
-    // load and create a texture
-    unsigned int diffuseMap, specularMap;
-    loadAndCreateTexture(diffuseMap, FileSystem::getPath("resources/textures/container2.png").c_str(),
-                         GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, true);
-    loadAndCreateTexture(specularMap, FileSystem::getPath("resources/textures/container2_specular.png").c_str(),
-                         GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, true);
+    textures.push_back(&diffuseTexture);
+    textures.push_back(&specularTexture);
 
-    // light source
-    unsigned int lightCubeVAO;
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
-
-    // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    ourShader.use();
-    ourShader.setInt("material.diffuse", 0);
-    ourShader.setInt("material.specular", 1);
+    Mesh cube(vertices, {}, textures);
+    Mesh light(vertices, {}, {});
 
     glEnable(GL_DEPTH_TEST);
 
@@ -160,39 +360,32 @@ int main()
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // bind textures on corresponding texture units
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specularMap);
-
-        ourShader.use();
-        ourShader.setVec3("viewPos", camera.Position);
-        ourShader.setVec3("light.position", lightPos);
-        ourShader.setVec3("light.direction", camera.Front);
+        cubeShader.use();
+        cubeShader.setVec3("viewPos", camera.Position);
+        cubeShader.setVec3("light.position", lightPos);
+        cubeShader.setVec3("light.direction", camera.Front);
         // material properties
-        ourShader.setFloat("material.shininess", 64.0f);
+        cubeShader.setFloat("material.shininess", 64.0f);
         // light source properties
-        ourShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        ourShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-        ourShader.setMat4("projection", projection);
+        cubeShader.setMat4("projection", projection);
         // camera
         glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("view", view);
-        glBindVertexArray(VAO);
-
-        // render
+        cubeShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         float angle = 45.0f;
         // model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-        ourShader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        cubeShader.setMat4("model", model);
+
+        
+        cube.Draw(cubeShader);
 
         // draw the lamp object
         lightShader.use();
@@ -204,9 +397,7 @@ int main()
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lightPos = glm::vec3(model[3]);
         lightShader.setMat4("model", model);
-
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        light.Draw(lightShader);
 
         // Double buffering:
         // Rendering is done in a hidden back buffer while the front buffer is displayed on screen.
@@ -221,39 +412,6 @@ int main()
     glfwTerminate();
 
     return 0;
-}
-
-bool loadAndCreateTexture(unsigned int &texture, const char *path, GLint wrap_s, GLint wrap_t, GLint min_filter, GLint mag_filter, bool verticalFlip)
-{
-    stbi_set_flip_vertically_on_load(verticalFlip);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
-
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
-
-    if (!data)
-    {
-        std::cout << "Failed to load texture: " << path << "\n";
-        stbi_image_free(data);
-        return false;
-    }
-
-    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-    GLenum internalFormat = format;
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
-
-    return true;
 }
 
 GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb)
