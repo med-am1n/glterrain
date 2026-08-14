@@ -3,7 +3,11 @@ project(Opengl-init)
 
 set(CMAKE_CXX_STANDARD 17)
 
+list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
+
 find_package(glfw3 REQUIRED)
+
+find_package(assimp REQUIRED)
 
 set(IMGUI_SOURCES
     external/imgui/imgui.cpp
@@ -31,5 +35,9 @@ target_include_directories(prog PRIVATE
 
 target_link_libraries(prog
     glfw
+    assimp::assimp
     "-framework OpenGL"
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework CoreVideo"
 )
