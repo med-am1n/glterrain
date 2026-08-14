@@ -23,7 +23,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-glm::vec3 lightPosInit = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 lightPosInit = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 lightPos = lightPosInit;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -370,6 +370,9 @@ int main()
         cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.setFloat("light.a", 0.1f);
+        cubeShader.setFloat("light.b", 0.7f);
+        cubeShader.setFloat("light.c", 1.0f);
 
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
