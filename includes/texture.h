@@ -8,27 +8,26 @@
 
 #include "shader.h"
 
-
-enum TextureType{
-    diffuse,
-    specular
+enum TextureType
+{
+    Diffuse,
+    Specular
 };
 
 class Texture
 {
 public:
     GLuint ID = 0;
-    
+
     TextureType type;
-    GLuint unit = 0;
+    std::string path;
 
     Texture(
         const char *image,
-        const TextureType texType,
-        GLuint slot)
+        TextureType texType)
+        : type(texType),
+          path(image)
     {
-        type = texType;
-        unit = slot;
 
         // Flip image vertically
         stbi_set_flip_vertically_on_load(true);
@@ -42,7 +41,7 @@ public:
             return;
         }
         glGenTextures(1, &ID);
-        glActiveTexture(GL_TEXTURE0 + unit);
+        // glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, ID);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -51,11 +50,26 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-        GLenum internalFormat = format;
+        GLenum format;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        else
+        {
+            std::cerr << "Unsupported texture format: " << nrChannels << " channels" << std::endl;
+            stbi_image_free(bytes);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glDeleteTextures(1, &ID);
+            ID = 0;
+
+            return;
+        }
 
         // Upload image to GPU
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(bytes);
 
@@ -72,7 +86,7 @@ public:
     {
         ID = other.ID;
         type = other.type;
-        unit = other.unit;
+        path = other.path;
 
         other.ID = 0;
     }
@@ -86,7 +100,7 @@ public:
 
             ID = other.ID;
             type = other.type;
-            unit = other.unit;
+            path = other.path;
 
             other.ID = 0;
         }
@@ -94,19 +108,26 @@ public:
         return *this;
     }
 
-    void texUnit(Shader &shader, const char *uniform)
+    void texUnit(
+        Shader &shader,
+        const char *uniform,
+        GLuint unit)
     {
         shader.use();
-        GLint texUni = glGetUniformLocation(shader.ID, uniform);
+
+        GLint texUni =
+            glGetUniformLocation(shader.ID, uniform);
+
         if (texUni == -1)
         {
             std::cerr << "Warning: texture uniform '" << uniform << "' was not found." << std::endl;
             return;
         }
+
         glUniform1i(texUni, unit);
     }
 
-    void Bind()
+    void Bind(GLuint unit)
     {
         if (ID == 0)
             return;
@@ -114,7 +135,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, ID);
     }
 
-    void Unbind()
+    void Unbind(GLuint unit)
     {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, 0);
