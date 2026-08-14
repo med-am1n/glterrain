@@ -327,14 +327,8 @@ int main()
          {0, 0, 0, 0}}};
 
     std::vector<Texture *> textures;
-    Texture diffuseTexture(
-        FileSystem::getPath("resources/textures/container2.png").c_str(), "texture_diffuse", 0);
-
-    Texture specularTexture(
-        FileSystem::getPath("resources/textures/container2_specular.png").c_str(), "texture_specular", 1);
-
-    diffuseTexture.texUnit(cubeShader, "material.diffuse");
-    specularTexture.texUnit(cubeShader, "material.specular");
+    Texture diffuseTexture(FileSystem::getPath("resources/textures/container2.png").c_str(), TextureType::diffuse, 0);
+    Texture specularTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str(), TextureType::specular, 1);
 
     textures.push_back(&diffuseTexture);
     textures.push_back(&specularTexture);

@@ -8,16 +8,23 @@
 
 #include "shader.h"
 
+
+enum TextureType{
+    diffuse,
+    specular
+};
+
 class Texture
 {
 public:
     GLuint ID = 0;
-    const char *type = nullptr;
+    
+    TextureType type;
     GLuint unit = 0;
 
     Texture(
         const char *image,
-        const char *texType,
+        const TextureType texType,
         GLuint slot)
     {
         type = texType;

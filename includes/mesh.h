@@ -56,22 +56,27 @@ public:
     // render the mesh
     void Draw(Shader &shader)
     {
-        for (unsigned int i = 0; i < textures.size(); i++)
+        // Keep track of how many of each type of textures we have
+        unsigned int numDiffuse = 0;
+        unsigned int numSpecular = 0;
+        for (unsigned int i = 0; i < textures.size(); ++i)
         {
-            for (Texture *texture : textures)
+            std::string num;
+            std::string type;
+            if (textures[i]->type == TextureType::diffuse)
             {
-                texture->Bind();
+                num = std::to_string(numDiffuse++);
+                type = "diffuse";
             }
-
-            glBindVertexArray(VAO);
-
-            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
-            glBindVertexArray(0);
-
-            glActiveTexture(GL_TEXTURE0);
-        }
-
+            else if (textures[i]->type == TextureType::specular)
+            {
+                num = std::to_string(numSpecular++);
+                type = "specular";
+            }
+            textures[i]->texUnit(shader, ("material." + type + num).c_str());
+            // std::cout<<"unifrom is :"<<("material." + type + num).c_str()<<std::endl;
+            textures[i]->Bind();
+        }   
         // draw mesh
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
