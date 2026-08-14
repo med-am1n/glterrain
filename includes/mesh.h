@@ -63,20 +63,26 @@ public:
         {
             std::string num;
             std::string type;
-            if (textures[i]->type == TextureType::diffuse)
+            switch (textures[i]->type)
             {
+            case TextureType::Diffuse:
                 num = std::to_string(numDiffuse++);
                 type = "diffuse";
-            }
-            else if (textures[i]->type == TextureType::specular)
-            {
+                break;
+
+            case TextureType::Specular:
                 num = std::to_string(numSpecular++);
                 type = "specular";
+                break;
             }
-            textures[i]->texUnit(shader, ("material." + type + num).c_str());
-            // std::cout<<"unifrom is :"<<("material." + type + num).c_str()<<std::endl;
-            textures[i]->Bind();
-        }   
+
+            std::string uniform = "material." + type + num;
+            textures[i]->texUnit(shader, uniform.c_str(), i);
+            //std::cout<<"unifrom is :"<<uniform.c_str()<<std::endl;
+            textures[i]->Bind(i);
+        }
+
+        // std::cout <<textures.size()<<std::endl;
         // draw mesh
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
