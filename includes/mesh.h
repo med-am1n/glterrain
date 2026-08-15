@@ -59,8 +59,11 @@ public:
         // Keep track of how many of each type of textures we have
         unsigned int numDiffuse = 0;
         unsigned int numSpecular = 0;
+        unsigned int numNormal = 0;
+        unsigned int numHeight = 0;
+        // std::cout<< "textures size : "<<textures.size()<<std::endl;
         for (unsigned int i = 0; i < textures.size(); ++i)
-        {
+        { 
             std::string num;
             std::string type;
             switch (textures[i]->type)
@@ -74,11 +77,22 @@ public:
                 num = std::to_string(numSpecular++);
                 type = "specular";
                 break;
+            case TextureType::Normal:
+                num = std::to_string(numNormal++);
+                type = "normal";
+                break;
+
+            case TextureType::Height:
+                num = std::to_string(numHeight++);
+                type = "height";
+                break;
+            default:
+                continue;
             }
 
             std::string uniform = "material." + type + num;
             textures[i]->texUnit(shader, uniform.c_str(), i);
-            //std::cout<<"unifrom is :"<<uniform.c_str()<<std::endl;
+            // std::cout << "unifrom is :" << uniform.c_str() << std::endl;
             textures[i]->Bind(i);
         }
 

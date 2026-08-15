@@ -158,7 +158,12 @@ private:
         // 2. specular maps
         auto specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::Specular);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
+        // 3. normal maps
+        auto normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, TextureType::Normal);
+        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        // 4. height maps
+        auto heightMaps = loadMaterialTextures(material,aiTextureType_HEIGHT, TextureType::Height);
+        textures.insert( textures.end(), heightMaps.begin(), heightMaps.end());
         // return a mesh object created from the extracted mesh data
         return Mesh(vertices, indices, textures);
     }
@@ -196,7 +201,7 @@ private:
 
             if (!skip)
             {
-                Texture texture( filename.c_str(), textureType);
+                Texture texture(filename.c_str(), textureType);
                 textures_loaded.push_back(std::move(texture));
                 textures.push_back(&textures_loaded.back());
             }

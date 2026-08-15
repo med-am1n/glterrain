@@ -11,7 +11,9 @@
 enum TextureType
 {
     Diffuse,
-    Specular
+    Specular,
+    Normal,
+    Height
 };
 
 class Texture
