@@ -16,8 +16,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb, GLFWscrollfun scroll_cb);
-bool loadAndCreateTexture(unsigned int &texture, const char *path, GLint wrap_s, GLint wrap_t, GLint min_filter, GLint mag_filter, bool verticalFlip);
-
+unsigned int LoadTexture(const char* path);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -40,9 +39,9 @@ int main()
     glfwInit();
 
     GLFWwindow *window = startGLFW(SCR_WIDTH, SCR_HEIGHT, "OpenGL",
-        framebuffer_size_callback,
-        mouse_callback,
-        scroll_callback);
+                                   framebuffer_size_callback,
+                                   mouse_callback,
+                                   scroll_callback);
 
     if (!window)
         return -1;
@@ -326,12 +325,19 @@ int main()
          {-1, -1, -1, -1},
          {0, 0, 0, 0}}};
 
-    std::vector<Texture *> textures;
-    Texture diffuseTexture(FileSystem::getPath("resources/textures/container2.png").c_str(), TextureType::Diffuse);
-    Texture specularTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str(), TextureType::Specular);
+    std::vector<Texture> textures;
+    Texture diffuseTexture(
+        LoadTexture(FileSystem::getPath("resources/textures/container2.png").c_str()),
+        "texture_diffuse",
+        FileSystem::getPath("resources/textures/container2.png"));
 
-    textures.push_back(&diffuseTexture);
-    textures.push_back(&specularTexture);
+    Texture specularTexture(
+        LoadTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str()),
+        "texture_specular",
+        FileSystem::getPath("resources/textures/container2_specular.png"));
+
+    textures.push_back(diffuseTexture);
+    textures.push_back(specularTexture);
 
     Mesh cube(vertices, {}, textures);
     Mesh light(vertices, {}, {});
@@ -381,7 +387,6 @@ int main()
         // model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
         cubeShader.setMat4("model", model);
 
-        
         cube.Draw(cubeShader);
 
         // draw the lamp object
@@ -436,6 +441,50 @@ GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffers
     glfwSetScrollCallback(window, scroll_cb);
 
     return window;
+}
+
+
+unsigned int LoadTexture(const char* path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels,0);
+
+    if (data)
+    {
+        GLenum format;
+
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        else
+            format = GL_RGB;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        glTexImage2D(GL_TEXTURE_2D,0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load texture: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }
 
 void processInput(GLFWwindow *window)

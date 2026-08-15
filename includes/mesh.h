@@ -7,11 +7,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <shader.h>
-#include <texture.h>
 
 #include <string>
 #include <vector>
 using namespace std;
+
+struct Texture
+{
+    unsigned int id;
+    string type;
+    string path;
+    Texture(unsigned int id, const string &type, const string &path)
+        : id(id), type(type), path(path)
+    {
+    }
+};
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -39,11 +49,11 @@ public:
     // mesh Data
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    vector<Texture *> textures;
+    vector<Texture> textures;
     unsigned int VAO;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture *> textures)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
     {
         this->vertices = vertices;
         this->indices = indices;
@@ -62,38 +72,25 @@ public:
         unsigned int numNormal = 0;
         unsigned int numHeight = 0;
         // std::cout<< "textures size : "<<textures.size()<<std::endl;
-        for (unsigned int i = 0; i < textures.size(); ++i)
-        { 
-            std::string num;
-            std::string type;
-            switch (textures[i]->type)
-            {
-            case TextureType::Diffuse:
-                num = std::to_string(numDiffuse++);
-                type = "diffuse";
-                break;
+        for (unsigned int i = 0; i < textures.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+            // retrieve texture number (the N in diffuse_textureN)
+            string number;
+            string name = textures[i].type;
+            if (name == "texture_diffuse")
+                number = std::to_string(numDiffuse++);
+            else if (name == "texture_specular")
+                number = std::to_string(numSpecular++); // transfer unsigned int to string
+            else if (name == "texture_normal")
+                number = std::to_string(numNormal++); // transfer unsigned int to string
+            else if (name == "texture_height")
+                number = std::to_string(numHeight++); // transfer unsigned int to string
 
-            case TextureType::Specular:
-                num = std::to_string(numSpecular++);
-                type = "specular";
-                break;
-            case TextureType::Normal:
-                num = std::to_string(numNormal++);
-                type = "normal";
-                break;
-
-            case TextureType::Height:
-                num = std::to_string(numHeight++);
-                type = "height";
-                break;
-            default:
-                continue;
-            }
-
-            std::string uniform = "material." + type + num;
-            textures[i]->texUnit(shader, uniform.c_str(), i);
-            // std::cout << "unifrom is :" << uniform.c_str() << std::endl;
-            textures[i]->Bind(i);
+            // now set the sampler to the correct texture unit
+            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+            // and finally bind the texture
+            glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
 
         // std::cout <<textures.size()<<std::endl;
