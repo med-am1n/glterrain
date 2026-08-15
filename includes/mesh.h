@@ -96,8 +96,11 @@ public:
         // std::cout <<textures.size()<<std::endl;
         // draw mesh
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-        // glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+        if(indices.size()){
+            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+        }else{
+            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        }
         glBindVertexArray(0);
 
         glActiveTexture(GL_TEXTURE0);
