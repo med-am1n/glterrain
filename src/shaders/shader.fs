@@ -7,6 +7,8 @@ in vec3 FragPos;
 struct Material {
 	sampler2D diffuse0;
     sampler2D specular0;
+	sampler2D normal0;
+	sampler2D height0;
     float shininess;
 };
 
@@ -89,5 +91,7 @@ vec4 spotLight(){
 void main()
 {	
 
-	FragColor = pointLight();
+	//FragColor = pointLight();
+	vec3 color =texture(material.diffuse0, TexCoord).rgb;
+    FragColor = vec4(color, 1.0);
 }
