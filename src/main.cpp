@@ -363,7 +363,7 @@ int main()
         cubeShader.use();
         cubeShader.setVec3("viewPos", camera.Position);
         // material properties
-        cubeShader.setFloat("material.shininess", 64.0f);
+        cubeShader.setFloat("shininess", 64.0f);
         // light source properties
         cubeShader.setVec3("pointLight.position", lightPos);
         cubeShader.setVec3("pointLight.ambient", 0.2f, 0.2f, 0.2f);
