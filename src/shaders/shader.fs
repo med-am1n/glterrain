@@ -66,7 +66,7 @@ vec4 calculatePointLight(){
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec3 specular = pointLight.specular * spec * vec3(texture(texture_specular0, TexCoord));
+	vec3 specular = pointLight.specular * spec * vec3(texture(texture_specular0, TexCoord).r);
 
 	return vec4(ambient + diffuse * inten + specular * inten, 1.0);
 }
