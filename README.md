@@ -1,33 +1,31 @@
-# opengl-init
+# OpenGL Init
 
+## Dependencies
+    - OpenGL APIs: gl:core=3.3
+    - glad 2.0.8
+    - C++17
 
-## future use refrence, 
+## Getting Started
 
-i may forget, nah sure i will so :
+### 1. Clone the Repository
+Clone the main repository to your local machine:
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
 
+### 2. Initialize Submodules
+The project uses Git submodules, you must initialize and clone them after cloning the main repository:
+```bash
+git submodule update --init --recursive
+```
+*(Alternatively, you can clone everything at once using `git clone --recurse-submodules <repository-url>`)*
 
+### 3. Build and Run
+Configure the project with CMake, compile, and run the executable:
+```bash
+cmake -S . -B build/
+cd build
+make && ./prog
+```
 ## Usage
-- update CmakeLists.txt project to the actual project name:
-    project("Opengl-init") = > project(Project-name)
-
-- update root_directory.h path to the actual project path:
-    logl_root = "/Users/ahmed/Desktop/repos/c/opengl-init"; = > static const char* logl_root = "path/to/project";
-
-
-- mkdir & cd to build and run: ``` cmake .. ```
-    or from root directory: ``` cmake -S . -B build/ ```
-
-
-- cd to build then: make then: ``` ./prog ```
-
-
-- for vscode to avoid some lint errors :
-
-    add includes/libraries/externals directories to the includePath in c_cpp_properties.json in .vscode dir:
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/external/glad/include",
-                "${workspaceFolder}/includes",
-                "${workspaceFolder}/external/glm",
-                "/opt/homebrew/include"
-            ], 
