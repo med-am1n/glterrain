@@ -1,4 +1,4 @@
-# OpenGL Init
+# Tessellation
 
 ## Dependencies
     - OpenGL APIs: gl:core=3.3
