@@ -57,7 +57,7 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    
+    Shader heightMapShader("../src/shaders/heightMap.vs", "../src/shaders/heightMap.fs"); 
     // load height map texture
     int width, height, nChannels;
     unsigned char *data = stbi_load("../resources/heightmaps/iceland_heightmap.png", &width, &height, &nChannels,  0);
@@ -100,6 +100,32 @@ int main()
       }
     }
     
+    const unsigned int NUM_STRIPS = height-1;
+    const unsigned int NUM_VERTS_PER_STRIP = width*2;
+    
+    // register VAO
+    GLuint terrainVAO, terrainVBO, terrainEBO;
+    glGenVertexArrays(1, &terrainVAO);
+    glBindVertexArray(terrainVAO);
+
+    glGenBuffers(1, &terrainVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
+    glBufferData(GL_ARRAY_BUFFER,
+             vertices.size() * sizeof(float),       // size of vertices buffer
+             &vertices[0],                          // pointer to first element
+             GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glGenBuffers(1, &terrainEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+             indices.size() * sizeof(unsigned int), // size of indices buffer
+             &indices[0],                           // pointer to first element
+             GL_STATIC_DRAW);
+    
     glEnable(GL_DEPTH_TEST);
 
     // render loop
@@ -113,12 +139,27 @@ int main()
 
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        heightMapShader.use();
 
-        // create transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
-        // camera
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
         glm::mat4 view = camera.GetViewMatrix();
+        heightMapShader.setMat4("projection", projection);
+        heightMapShader.setMat4("view", view);
+
+        // world transformation
         glm::mat4 model = glm::mat4(1.0f);
+        heightMapShader.setMat4("model", model);
+        
+        // render the cube
+        glBindVertexArray(terrainVAO);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        for(unsigned strip = 0; strip < NUM_STRIPS; strip++)
+        {
+            glDrawElements(GL_TRIANGLE_STRIP,   // primitive type
+                           NUM_VERTS_PER_STRIP+2,   // number of indices to render
+                           GL_UNSIGNED_INT,     // index data type
+                           (void*)(sizeof(unsigned) * (NUM_VERTS_PER_STRIP+2) * strip)); // offset to starting index
+        }
 
         glfwSwapBuffers(window);
 
