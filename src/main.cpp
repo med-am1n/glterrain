@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -57,7 +58,36 @@ int main()
     }
     // build and compile the shader program
     Shader lightShader("../src/shaders/lightShader.vs", "../src/shaders/lightShader.fs");
+    
+    // load height map texture
+    int width, height, nChannels;
+    unsigned char *data = stbi_load("../resources/heightmaps/iceland_heightmap.png", &width, &height, &nChannels,  0);
+     if(!data){
+      std::cout<<"Error loading heightmap!\n";
+      exit(EXIT_FAILURE);
+    }
+    // vertex generation
+    std::vector<float> vertices;
+    float yScale = 64.0f / 256.0f, yShift = 16.0f;  // apply a scale+shift to the height data
+    for(unsigned int i = 0; i < height; i++)
+    {
+      for(unsigned int j = 0; j < width; j++)
+        {
+          // retrieve texel for (i,j) tex coord
+          unsigned char* texel = data + (j + width * i) * nChannels;
+          // raw height at coordinate
+          unsigned char y = texel[0];
 
+          // vertex
+          // X = i - height/2 and  Z = j - width/2 : centers the terrain around the origin.
+          vertices.push_back( -height/2.0f + i );        // v.x 
+          vertices.push_back( (int)y * yScale - yShift); // v.y
+          vertices.push_back( -width/2.0f + j );        // v.z
+        }
+     }
+    
+    stbi_image_free(data);
+    
     std::vector<Vertex> lightVertices = {
         {{-0.5f, -0.5f, -0.5f}},
         {{0.5f, -0.5f, -0.5f}},
