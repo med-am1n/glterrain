@@ -56,7 +56,7 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    Shader floorShader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
+    Shader floorShader("../src/shaders/flatShader.vs", "../src/shaders/flatshader.fs");
     Shader lightShader("../src/shaders/lightShader.vs", "../src/shaders/lightShader.fs");
 
     std::vector<Vertex> vertices =
