@@ -88,6 +88,19 @@ int main()
     
     stbi_image_free(data);
     
+    // index generation
+    std::vector<unsigned int> indices;
+    for(unsigned int i = 0; i < height-1; i++)       // for each row a.k.a. each strip
+    {
+      for(unsigned int j = 0; j < width; j++)      // for each column
+      {
+          for(unsigned int k = 0; k < 2; k++)      // for each side of the strip
+          {
+            indices.push_back(j + width * (i + k));
+          }
+      }
+    }
+    
     std::vector<Vertex> lightVertices = {
         {{-0.5f, -0.5f, -0.5f}},
         {{0.5f, -0.5f, -0.5f}},
