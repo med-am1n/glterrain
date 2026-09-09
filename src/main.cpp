@@ -12,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void window_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
@@ -20,12 +21,14 @@ unsigned int LoadTexture(const char *path);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+int windowWidth = SCR_WIDTH;
+int windowHeight = SCR_HEIGHT;
 // camera
 Camera camera(glm::vec3(0.0f, 1.0f, 3.0f));
 glm::vec3 lightPosInit = glm::vec3(1.0f, 1.0f, 0.0f);
 glm::vec3 lightPos = lightPosInit;
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+float lastX = windowWidth / 2.0f;
+float lastY = windowHeight / 2.0f;
 bool firstMouse = true;
 
 float deltaTime = 0.0f;
@@ -38,7 +41,7 @@ int main()
 
     glfwInit();
 
-    GLFWwindow *window = startGLFW(SCR_WIDTH, SCR_HEIGHT, "OpenGL",
+    GLFWwindow *window = startGLFW(windowWidth, windowHeight, "OpenGL",
                                    framebuffer_size_callback,
                                    mouse_callback,
                                    scroll_callback);
@@ -174,7 +177,7 @@ int main()
         floorShader.setFloat("pointLight.c", 1.0f);
 
         // create transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
         floorShader.setMat4("projection", projection);
         // camera
@@ -238,7 +241,7 @@ GLFWwindow *startGLFW(int width, int height, const char *title, GLFWframebuffers
     glfwSetFramebufferSizeCallback(window, fb_cb);
     glfwSetCursorPosCallback(window, mouse_cb);
     glfwSetScrollCallback(window, scroll_cb);
-
+    glfwSetWindowSizeCallback(window, window_size_callback);
     return window;
 }
 
@@ -308,6 +311,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    windowWidth = width;
+    windowHeight = height;
+}
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
