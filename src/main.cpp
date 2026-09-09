@@ -57,7 +57,6 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    Shader lightShader("../src/shaders/lightShader.vs", "../src/shaders/lightShader.fs");
     
     // load height map texture
     int width, height, nChannels;
@@ -96,44 +95,11 @@ int main()
       {
           for(unsigned int k = 0; k < 2; k++)      // for each side of the strip
           {
-            indices.push_back(j + width * (i + k));
+            indices.push_back(j + width * (i + k)); // if width=4 [0,4,1,5,2,6,3,7 ..etc]
           }
       }
     }
     
-    std::vector<Vertex> lightVertices = {
-        {{-0.5f, -0.5f, -0.5f}},
-        {{0.5f, -0.5f, -0.5f}},
-        {{0.5f, 0.5f, -0.5f}},
-        {{-0.5f, 0.5f, -0.5f}},
-
-        {{-0.5f, -0.5f, 0.5f}},
-        {{0.5f, -0.5f, 0.5f}},
-        {{0.5f, 0.5f, 0.5f}},
-        {{-0.5f, 0.5f, 0.5f}}};
-
-    std::vector<unsigned int> lightIndices = {
-        // back
-        0, 1, 2,
-        2, 3, 0,
-        // front
-        4, 5, 6,
-        6, 7, 4,
-        // left
-        0, 3, 7,
-        7, 4, 0,
-        // right
-        1, 5, 6,
-        6, 2, 1,
-        // bottom
-        0, 4, 5,
-        5, 1, 0,
-        // top
-        3, 2, 6,
-        6, 7, 3};
-
-    Mesh light(lightVertices, lightIndices, {});
-
     glEnable(GL_DEPTH_TEST);
 
     // render loop
@@ -145,27 +111,14 @@ int main()
         // input
         processInput(window);
 
-
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
         // camera
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
-        // draw the lamp object
-        lightShader.use();
-        lightShader.setMat4("projection", projection);
-        lightShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::translate(model, lightPosInit);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lightPos = glm::vec3(model[3]);
-        lightShader.setMat4("model", model);
-        light.Draw(lightShader);
 
         glfwSwapBuffers(window);
 
