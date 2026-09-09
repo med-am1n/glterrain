@@ -56,46 +56,7 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    Shader floorShader("../src/shaders/flatShader.vs", "../src/shaders/flatshader.fs");
     Shader lightShader("../src/shaders/lightShader.vs", "../src/shaders/lightShader.fs");
-
-    std::vector<Vertex> vertices =
-        {
-            {
-                glm::vec3(-10.0f, 0.0f, 10.0f), // Position
-                glm::vec3(0.0f, 1.0f, 0.0f),    // Normal
-                glm::vec2(0.0f, 0.0f),          // TexCoords
-                glm::vec3(0.0f),
-                glm::vec3(0.0f),
-                {0},   // m_BoneIDs
-                {0.0f} // m_Weights
-            },
-            {glm::vec3(-10.0f, 0.0f, -10.0f),
-             glm::vec3(0.0f, 1.0f, 0.0f),
-             glm::vec2(0.0f, 10.0f),
-             glm::vec3(0.0f),
-             glm::vec3(0.0f),
-             {0},
-             {0.0f}},
-            {glm::vec3(10.0f, 0.0f, -10.0f),
-             glm::vec3(0.0f, 1.0f, 0.0f),
-             glm::vec2(10.0f, 10.0f),
-             glm::vec3(0.0f),
-             glm::vec3(0.0f),
-             {0},
-             {0.0f}},
-            {glm::vec3(10.0f, 0.0f, 10.0f),
-             glm::vec3(0.0f, 1.0f, 0.0f),
-             glm::vec2(10.0f, 0.0f),
-             glm::vec3(0.0f),
-             glm::vec3(0.0f),
-             {0},
-             {0.0f}}};
-
-    std::vector<unsigned int> indices =
-        {
-            0, 1, 2,
-            0, 2, 3};
 
     std::vector<Vertex> lightVertices = {
         {{-0.5f, -0.5f, -0.5f}},
@@ -128,21 +89,6 @@ int main()
         3, 2, 6,
         6, 7, 3};
 
-    std::vector<Texture> textures;
-    Texture diffuseTexture(
-        LoadTexture(FileSystem::getPath("resources/textures/planks.png").c_str()),
-        "texture_diffuse",
-        FileSystem::getPath("resources/textures/planks.png"));
-
-    Texture specularTexture(
-        LoadTexture(FileSystem::getPath("resources/textures/planksSpec.png").c_str()),
-        "texture_specular",
-        FileSystem::getPath("resources/textures/planksSpec.png"));
-
-    textures.push_back(diffuseTexture);
-    textures.push_back(specularTexture);
-
-    Mesh floor(vertices, indices, textures);
     Mesh light(lightVertices, lightIndices, {});
 
     glEnable(GL_DEPTH_TEST);
@@ -156,41 +102,16 @@ int main()
         // input
         processInput(window);
 
-        // rendering commands here
 
-        // Whenever we call glClear and clear the color buffer,
-        // the entire color buffer will be filled with the color asconfigured by glClearColor.
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        floorShader.use();
-        floorShader.setVec3("viewPos", camera.Position);
-        // material properties
-        floorShader.setFloat("shininess", 64.0f);
-        // light source properties
-        floorShader.setVec3("pointLight.position", lightPos);
-        floorShader.setVec3("pointLight.ambient", 0.2f, 0.2f, 0.2f);
-        floorShader.setVec3("pointLight.diffuse", 0.5f, 0.5f, 0.5f);
-        floorShader.setVec3("pointLight.specular", 1.0f, 1.0f, 1.0f);
-        floorShader.setFloat("pointLight.a", 0.1f);
-        floorShader.setFloat("pointLight.b", 0.7f);
-        floorShader.setFloat("pointLight.c", 1.0f);
 
         // create transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
-        // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-        floorShader.setMat4("projection", projection);
         // camera
         glm::mat4 view = camera.GetViewMatrix();
-        floorShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        float angle = 45.0f;
-        // model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-        floorShader.setMat4("model", model);
-
-        floor.Draw(floorShader);
-
         // draw the lamp object
         lightShader.use();
         lightShader.setMat4("projection", projection);
@@ -203,10 +124,6 @@ int main()
         lightShader.setMat4("model", model);
         light.Draw(lightShader);
 
-        // Double buffering:
-        // Rendering is done in a hidden back buffer while the front buffer is displayed on screen.
-        // Once rendering is complete, buffers are swapped (glfwSwapBuffers) to avoid flickering
-        // and ensure the user only sees fully rendered frames -no flickering issues.
         glfwSwapBuffers(window);
 
         // check and call events
