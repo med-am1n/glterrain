@@ -25,7 +25,7 @@ const unsigned int SCR_HEIGHT = 600;
 int windowWidth = SCR_WIDTH;
 int windowHeight = SCR_HEIGHT;
 // camera
-Camera camera(glm::vec3(0.0f, 1.0f, 3.0f));
+Camera camera(glm::vec3(67.0f, 627.5f, 169.9f), glm::vec3(0.0f, 1.0f, 0.0f), -128.1f, -42.4f);
 glm::vec3 lightPosInit = glm::vec3(1.0f, 1.0f, 0.0f);
 glm::vec3 lightPos = lightPosInit;
 float lastX = windowWidth / 2.0f;
