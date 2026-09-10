@@ -26,15 +26,34 @@ set(IMGUI_SOURCES
     external/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+# GLad version configuration
+set(GLAD_VERSION "41" CACHE STRING "GLAD version")
+
+set(GLAD_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/glad${GLAD_VERSION}")
+set(GLAD_INCLUDE_DIR "${GLAD_ROOT}/include")
+set(GLAD_SOURCE "${GLAD_ROOT}/src/glad.c")
+
+if(NOT EXISTS "${GLAD_INCLUDE_DIR}/glad/glad.h")
+    message(FATAL_ERROR
+        "GLAD version ${GLAD_VERSION} not found at ${GLAD_ROOT}"
+    )
+endif()
+
+if(NOT EXISTS "${GLAD_SOURCE}")
+    message(FATAL_ERROR
+        "GLAD source not found: ${GLAD_SOURCE}"
+    )
+endif()
+
 add_executable(prog
     src/main.cpp
     src/stb_image.cpp
-    external/glad/src/gl.c
+    ${GLAD_SOURCE}
     ${IMGUI_SOURCES}
 )
 
 target_include_directories(prog PRIVATE
-    external/glad/include
+    ${GLAD_INCLUDE_DIR}
     external/glm
     external/imgui
     includes
