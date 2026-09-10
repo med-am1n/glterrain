@@ -3,9 +3,53 @@
 // number of control points per patch output
 layout (vertices=4) out;
 
+uniform mat4 model;
+uniform mat4 view;
+
 in vec2 TexCoord[];
 
 out vec2 TextureCoord[];
+
+uniform bool useLOD;
+
+struct TessLevels
+{
+    float outer[4];
+    float inner[2];
+};
+
+TessLevels calculateLOD()
+{
+    // control tessellation parameters
+    const float MIN_TESS_LEVEL = 4.0;
+    const float MAX_TESS_LEVEL = 64.0;
+    const float MIN_DISTANCE = 20.0;
+    const float MAX_DISTANCE = 800.0;
+
+    // transform each vertex into eye space
+    vec4 eyeSpacePos00 = view * model * gl_in[0].gl_Position;
+    vec4 eyeSpacePos01 = view * model * gl_in[1].gl_Position;
+    vec4 eyeSpacePos10 = view * model * gl_in[2].gl_Position;
+    vec4 eyeSpacePos11 = view * model * gl_in[3].gl_Position;
+    
+    // distance from camera scaled between 0 and 1
+    float distance00 = clamp((abs(eyeSpacePos00.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
+    float distance01 = clamp((abs(eyeSpacePos01.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
+    float distance10 = clamp((abs(eyeSpacePos10.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
+    float distance11 = clamp((abs(eyeSpacePos11.z) - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
+
+    // interpolate edge tessellation level based on closer vertex
+    TessLevels levels;
+    levels.outer[0] = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance10, distance00));
+    levels.outer[1] = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL,min(distance00, distance01));
+    levels.outer[2] = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance01, distance11));
+    levels.outer[3] = mix(MAX_TESS_LEVEL, MIN_TESS_LEVEL, min(distance11, distance10));
+
+    levels.inner[0] = max(levels.outer[1], levels.outer[3]);
+    levels.inner[1] = max(levels.outer[0], levels.outer[2]);
+
+    return levels;
+}
 
 void main()
 {
@@ -15,12 +59,27 @@ void main()
     // invocation zero controls tessellation levels for the entire patch
     if (gl_InvocationID == 0)
     {
-        gl_TessLevelOuter[0] = 16;
-        gl_TessLevelOuter[1] = 16;
-        gl_TessLevelOuter[2] = 16;
-        gl_TessLevelOuter[3] = 16;
+        if (useLOD)
+        {
+            TessLevels levels = calculateLOD();
 
-        gl_TessLevelInner[0] = 16;
-        gl_TessLevelInner[1] = 16;
+            gl_TessLevelOuter[0] = levels.outer[0];
+            gl_TessLevelOuter[1] = levels.outer[1];
+            gl_TessLevelOuter[2] = levels.outer[2];
+            gl_TessLevelOuter[3] = levels.outer[3];
+
+            gl_TessLevelInner[0] = levels.inner[0];
+            gl_TessLevelInner[1] = levels.inner[1];
+        }
+        else
+        {
+            gl_TessLevelOuter[0] = 16.0;
+            gl_TessLevelOuter[1] = 16.0;
+            gl_TessLevelOuter[2] = 16.0;
+            gl_TessLevelOuter[3] = 16.0;
+
+            gl_TessLevelInner[0] = 16.0;
+            gl_TessLevelInner[1] = 16.0;
+        }
     }
 }
