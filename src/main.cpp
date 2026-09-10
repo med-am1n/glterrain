@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <glad/gl.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "shader.h"
@@ -51,7 +51,7 @@ int main()
         return -1;
 
     // initialize GLAD
-    if (!gladLoadGL(glfwGetProcAddress))
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD\n";
         return -1;
