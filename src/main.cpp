@@ -85,20 +85,29 @@ int main()
         std::cout << "Failed to load texture" << std::endl;
     }
 
-    unsigned int grassTexture = LoadTexture("../resources/textures/grass.jpg");
-    
+    unsigned int grass1Texture = LoadTexture("../resources/textures/grass1.jpg");
+    unsigned int grass2Texture = LoadTexture("../resources/textures/grass2.jpg");
+
+    unsigned int snowTexture = LoadTexture("../resources/textures/snow.jpg");
     // Heightmap
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, heightmapTexture);
 
-    // Grass
+    // Grass 1
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, grassTexture);
+    glBindTexture(GL_TEXTURE_2D, grass1Texture);
+    // grass 2 
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, grass2Texture);
     
+    // snow 
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, snowTexture);
     heightMapShader.use(); 
     heightMapShader.setInt("heightMap", 0);
-    heightMapShader.setInt("grassTexture", 1);
-
+    heightMapShader.setInt("grass1Texture", 1);
+    heightMapShader.setInt("grass2Texture", 2);
+    heightMapShader.setInt("snowTexture", 3);
     // vertex generation
     std::vector<float> vertices;
     unsigned rez = 20;

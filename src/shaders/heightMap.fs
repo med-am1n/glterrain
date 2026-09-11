@@ -5,10 +5,24 @@ in vec2 Tex;
 
 out vec4 FragColor;
 
-uniform sampler2D grassTexture;
-
+uniform sampler2D grass1Texture;
+uniform sampler2D grass2Texture;
+uniform sampler2D snowTexture;
 void main()
 {
-    FragColor = texture(grassTexture, Tex * 20.0);
+    vec2 uv = Tex * 20.0;
+
+    if (Height < 1.0)
+    {
+        FragColor = texture(grass1Texture, uv);
+    }
+    else if (Height < 140.0)
+    {
+        FragColor = texture(grass2Texture, uv);
+    }
+    else
+    {
+        FragColor = texture(snowTexture, uv);
+    }
 }
 
