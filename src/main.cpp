@@ -85,29 +85,38 @@ int main()
         std::cout << "Failed to load texture" << std::endl;
     }
 
-    unsigned int grass1Texture = LoadTexture("../resources/textures/grass1.jpg");
-    unsigned int grass2Texture = LoadTexture("../resources/textures/grass2.jpg");
-
-    unsigned int snowTexture = LoadTexture("../resources/textures/snow.jpg");
+    unsigned int height0Texture = LoadTexture("../resources/textures/height0.jpg");
+    unsigned int height1Texture = LoadTexture("../resources/textures/height1.jpg");
+    unsigned int height2Texture = LoadTexture("../resources/textures/height2.jpg");
+    unsigned int height3Texture = LoadTexture("../resources/textures/height3.jpg");
+    unsigned int height4Texture = LoadTexture("../resources/textures/height4.jpg");
     // Heightmap
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, heightmapTexture);
 
-    // Grass 1
+    // height 0
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, grass1Texture);
-    // grass 2 
+    glBindTexture(GL_TEXTURE_2D, height0Texture);
+    // height 1
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, grass2Texture);
-    
-    // snow 
+    glBindTexture(GL_TEXTURE_2D, height1Texture);
+    // height 2 
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, snowTexture);
+    glBindTexture(GL_TEXTURE_2D, height2Texture);
+    // height 3
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, height3Texture);
+    // height 4 
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, height4Texture);
+    
     heightMapShader.use(); 
     heightMapShader.setInt("heightMap", 0);
-    heightMapShader.setInt("grass1Texture", 1);
-    heightMapShader.setInt("grass2Texture", 2);
-    heightMapShader.setInt("snowTexture", 3);
+    heightMapShader.setInt("gTextureHeight0", 1);
+    heightMapShader.setInt("gTextureHeight1", 2);
+    heightMapShader.setInt("gTextureHeight2", 3);
+    heightMapShader.setInt("gTextureHeight3", 4);
+    heightMapShader.setInt("gTextureHeight4", 5);
     // vertex generation
     std::vector<float> vertices;
     unsigned rez = 20;
