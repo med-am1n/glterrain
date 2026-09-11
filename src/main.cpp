@@ -59,10 +59,10 @@ int main()
     }
     // build and compile the shader program
     Shader heightMapShader("../src/shaders/heightMap.vs", "../src/shaders/heightMap.fs", nullptr, "../src/shaders/heightMap.tcs", "../src/shaders/heightMap.tes"); 
-    unsigned int texture;
-    glGenTextures(1, &texture);
+    unsigned int heightmapTexture;
+    glGenTextures(1, &heightmapTexture);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    glBindTexture(GL_TEXTURE_2D, heightmapTexture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -77,13 +77,28 @@ int main()
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        heightMapShader.setInt("heightMap", 0);
         std::cout << "Loaded heightmap of size " << height << " x " << width << std::endl;
     }
     else
     {
         std::cout << "Failed to load texture" << std::endl;
     }
+
+    unsigned int grassTexture = LoadTexture("../resources/textures/grass.jpg");
+
+    // Heightmap
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, heightmapTexture);
+
+    // Grass
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, grassTexture);
+    
+
+    heightMapShader.use(); 
+    heightMapShader.setInt("heightMap", 0);
+    heightMapShader.setInt("grassTexture", 1);
+
     // vertex generation
     std::vector<float> vertices;
     unsigned rez = 20;
