@@ -182,6 +182,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         heightMapShader.use();
 
+        heightMapShader.setVec3("dirLight.direction", glm::vec3(-0.5f, -1.0f, -0.3f));
+        heightMapShader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+        heightMapShader.setVec3("dirLight.diffuse", 1.0f, 1.0f, 1.0f);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
         glm::mat4 view = camera.GetViewMatrix();
         heightMapShader.setMat4("projection", projection);

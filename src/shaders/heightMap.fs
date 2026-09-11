@@ -2,7 +2,8 @@
 
 in float Height;
 in vec2 Tex;
-
+in vec3 Normal;
+in vec3 FragPos;
 out vec4 FragColor;
 
 uniform sampler2D gTextureHeight0;
@@ -18,6 +19,27 @@ uniform float gHeight3 = 170.0;
 uniform float gHeight4 = 250.0;
 
 uniform float gTextureScale = 20.0;
+
+struct DirLight {
+    vec3 direction;
+  
+    vec3 ambient;
+    vec3 diffuse;
+};
+
+uniform DirLight dirLight;
+
+vec4 calculateDirectLight(vec3 baseColor){
+	// ambient
+    vec3 ambient = dirLight.ambient * baseColor;
+	// diffuse
+	vec3 norm = normalize(Normal);
+	vec3 lightDir = normalize(-dirLight.direction);
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = dirLight.diffuse * diff * baseColor;
+
+	return vec4(ambient + diffuse, 1.0);
+}
 
 void main()
 {
@@ -60,6 +82,6 @@ void main()
         color = texture(gTextureHeight4, uv);
     }
 
-    FragColor = color;
+      FragColor = calculateDirectLight(color.rgb);
 }
 
