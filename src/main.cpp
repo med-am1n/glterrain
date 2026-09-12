@@ -114,8 +114,8 @@ int main()
     heightMapShader.setInt("heightMap", 0);
 
     for (int i = 0; i < materialCount; i++) { 
-      heightMapShader.setInt("gTextureHeight" + std::to_string(i), 1 + i); 
-      heightMapShader.setInt("gTextureHeight" + std::to_string(i) + "Spec", 6 + i); 
+      heightMapShader.setInt("texture_diffuse" + std::to_string(i), 1 + i); 
+      heightMapShader.setInt("texture_specular" + std::to_string(i), + 6 + i); 
     }
    
     // vertex generation

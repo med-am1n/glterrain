@@ -6,18 +6,18 @@ in vec3 Normal;
 in vec3 FragPos;
 out vec4 FragColor;
 
-uniform sampler2D gTextureHeight0;
-uniform sampler2D gTextureHeight1;
-uniform sampler2D gTextureHeight2;
-uniform sampler2D gTextureHeight3;
-uniform sampler2D gTextureHeight4;
+uniform sampler2D texture_diffuse0;
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_diffuse2;
+uniform sampler2D texture_diffuse3;
+uniform sampler2D texture_diffuse4;
 
 // Height spec textures
-uniform sampler2D gTextureHeight0Spec;
-uniform sampler2D gTextureHeight1Spec;
-uniform sampler2D gTextureHeight2Spec;
-uniform sampler2D gTextureHeight3Spec;
-uniform sampler2D gTextureHeight4Spec;
+uniform sampler2D texture_specular0;
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_specular2;
+uniform sampler2D texture_specular3;
+uniform sampler2D texture_specular4;
 
 uniform float gHeight0 = 1.0;
 uniform float gHeight1 = 50.0;
@@ -67,57 +67,57 @@ void main()
     vec3 specularColor;
     if (Height < gHeight0)
     {
-        color = texture(gTextureHeight0, uv);
-        specularColor = texture(gTextureHeight0Spec, uv).rgb;
+        color = texture(texture_diffuse0, uv);
+        specularColor = texture(texture_specular0, uv).rgb;
     }
     else if (Height < gHeight1)
     {
         float factor = (Height - gHeight0) / (gHeight1 - gHeight0);
-        vec4 color0 = texture(gTextureHeight0, uv);
-        vec4 color1 = texture(gTextureHeight1, uv);
+        vec4 color0 = texture(texture_diffuse0, uv);
+        vec4 color1 = texture(texture_diffuse1, uv);
         color = mix(color0, color1, clamp(factor, 0.0, 1.0));
         // Specular
-        vec3 spec0 = texture(gTextureHeight0Spec, uv).rgb;
-        vec3 spec1 = texture(gTextureHeight1Spec, uv).rgb;
+        vec3 spec0 = texture(texture_specular0, uv).rgb;
+        vec3 spec1 = texture(texture_specular1, uv).rgb;
         specularColor = mix(spec0, spec1, factor);
     }
     else if (Height < gHeight2)
     {
         float factor = (Height - gHeight1) / (gHeight2 - gHeight1);
-        vec4 color0 = texture(gTextureHeight1, uv);
-        vec4 color1 = texture(gTextureHeight2, uv);
+        vec4 color0 = texture(texture_diffuse1, uv);
+        vec4 color1 = texture(texture_diffuse2, uv);
         color = mix(color0, color1, clamp(factor, 0.0, 1.0));
         // Specular
-        vec3 spec0 = texture(gTextureHeight1Spec, uv).rgb;
-        vec3 spec1 = texture(gTextureHeight2Spec, uv).rgb;
+        vec3 spec0 = texture(texture_specular1, uv).rgb;
+        vec3 spec1 = texture(texture_specular2, uv).rgb;
         specularColor = mix(spec0, spec1, factor);
     }
     else if (Height < gHeight3)
     {
         float factor = (Height - gHeight2) / (gHeight3 - gHeight2);
-        vec4 color0 = texture(gTextureHeight2, uv);
-        vec4 color1 = texture(gTextureHeight3, uv);
+        vec4 color0 = texture(texture_diffuse2, uv);
+        vec4 color1 = texture(texture_diffuse3, uv);
         color = mix(color0, color1, clamp(factor, 0.0, 1.0));
         // Specular
-        vec3 spec0 = texture(gTextureHeight2Spec, uv).rgb;
-        vec3 spec1 = texture(gTextureHeight3Spec, uv).rgb;
+        vec3 spec0 = texture(texture_specular2, uv).rgb;
+        vec3 spec1 = texture(texture_specular3, uv).rgb;
         specularColor = mix(spec0, spec1, factor);
     }
     else if (Height < gHeight4)
     {
         float factor = (Height - gHeight3) / (gHeight4 - gHeight3);
-        vec4 color0 = texture(gTextureHeight3, uv);
-        vec4 color1 = texture(gTextureHeight4, uv);
+        vec4 color0 = texture(texture_diffuse3, uv);
+        vec4 color1 = texture(texture_diffuse4, uv);
         color = mix(color0, color1, clamp(factor, 0.0, 1.0));
         // Specular
-        vec3 spec0 = texture(gTextureHeight3Spec, uv).rgb;
-        vec3 spec1 = texture(gTextureHeight4Spec, uv).rgb;
+        vec3 spec0 = texture(texture_specular3, uv).rgb;
+        vec3 spec1 = texture(texture_specular4, uv).rgb;
         specularColor = mix(spec0, spec1, factor);
     }
     else
     {
-        color = texture(gTextureHeight4, uv);
-        specularColor = texture(gTextureHeight4Spec, uv).rgb;
+        color = texture(texture_diffuse4, uv);
+        specularColor = texture(texture_specular4, uv).rgb;
     }
 
       FragColor = calculateDirectLight(color.rgb, specularColor);
