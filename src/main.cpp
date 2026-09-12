@@ -86,13 +86,20 @@ int main()
     }
     
     
-    const int materialCount = 5;
+    std::vector<std::string> materialDirs = {
+        "../resources/textures/dirt/",
+        "../resources/textures/rock/",
+        "../resources/textures/grass/",
+        "../resources/textures/snow1/",
+        "../resources/textures/snow2/"
+    };
+    const int materialCount = materialDirs.size();
     unsigned int heightTextures[materialCount];
     unsigned int specTextures[materialCount];
 
-    for (int i = 0; i < materialCount; i++) { 
-      heightTextures[i] = LoadTexture(("../resources/textures/height" + std::to_string(i) + ".jpg").c_str()); 
-      specTextures[i] = LoadTexture(("../resources/textures/height" + std::to_string(i) + "spec.jpg").c_str()); 
+    for (int i = 0; i < materialDirs.size(); i++) { 
+      heightTextures[i] = LoadTexture((materialDirs[i] + "diffuse.jpg").c_str()); 
+      specTextures[i] = LoadTexture((materialDirs[i] + "specular.jpg").c_str()); 
     }
     
     glActiveTexture(GL_TEXTURE0);
