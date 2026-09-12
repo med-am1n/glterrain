@@ -84,74 +84,33 @@ int main()
     {
         std::cout << "Failed to load texture" << std::endl;
     }
+    
+    
+    const int materialCount = 5;
+    unsigned int heightTextures[materialCount];
+    unsigned int specTextures[materialCount];
 
-    unsigned int height0Texture = LoadTexture("../resources/textures/height0.jpg");
-    unsigned int height1Texture = LoadTexture("../resources/textures/height1.jpg");
-    unsigned int height2Texture = LoadTexture("../resources/textures/height2.jpg");
-    unsigned int height3Texture = LoadTexture("../resources/textures/height3.jpg");
-    unsigned int height4Texture = LoadTexture("../resources/textures/height4.jpg");
-    // Heightmap
+    for (int i = 0; i < materialCount; i++) { 
+      heightTextures[i] = LoadTexture(("../resources/textures/height" + std::to_string(i) + ".jpg").c_str()); 
+      specTextures[i] = LoadTexture(("../resources/textures/height" + std::to_string(i) + "spec.jpg").c_str()); 
+    }
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, heightmapTexture);
 
-    // height 0
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, height0Texture);
-    // height 1
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, height1Texture);
-    // height 2 
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, height2Texture);
-    // height 3
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, height3Texture);
-    // height 4 
-    glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, height4Texture);
-    
-    unsigned int height0SpecTexture = LoadTexture("../resources/textures/height0spec.jpg");
-    unsigned int height1SpecTexture = LoadTexture("../resources/textures/height1spec.jpg");
-    unsigned int height2SpecTexture = LoadTexture("../resources/textures/height2spec.jpg");
-    unsigned int height3SpecTexture = LoadTexture("../resources/textures/height3spec.jpg");
-    unsigned int height4SpecTexture = LoadTexture("../resources/textures/height4spec.jpg");
+    for (int i = 0; i < materialCount; i++) { 
+      glActiveTexture(GL_TEXTURE1 + i); glBindTexture(GL_TEXTURE_2D, heightTextures[i]); 
+      glActiveTexture(GL_TEXTURE6 + i); glBindTexture(GL_TEXTURE_2D, specTextures[i]); 
+    }
 
-    // Height spec textures
-    // height 0 spec
-    glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, height0SpecTexture);
-
-    // height 1 spec
-    glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, height1SpecTexture);
-
-    // height 2 spec
-    glActiveTexture(GL_TEXTURE8);
-    glBindTexture(GL_TEXTURE_2D, height2SpecTexture);
-
-    // height 3 spec
-    glActiveTexture(GL_TEXTURE9);
-    glBindTexture(GL_TEXTURE_2D, height3SpecTexture);
-
-    // height 4 spec
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(GL_TEXTURE_2D, height4SpecTexture);
-    
-    heightMapShader.use(); 
+    heightMapShader.use();
     heightMapShader.setInt("heightMap", 0);
-    heightMapShader.setInt("gTextureHeight0", 1);
-    heightMapShader.setInt("gTextureHeight1", 2);
-    heightMapShader.setInt("gTextureHeight2", 3);
-    heightMapShader.setInt("gTextureHeight3", 4);
-    heightMapShader.setInt("gTextureHeight4", 5);
-    
-   // Height spec textures
-    heightMapShader.setInt("gTextureHeight0Spec", 6);
-    heightMapShader.setInt("gTextureHeight1Spec", 7);
-    heightMapShader.setInt("gTextureHeight2Spec", 8);
-    heightMapShader.setInt("gTextureHeight3Spec", 9);
-    heightMapShader.setInt("gTextureHeight4Spec", 10);
 
+    for (int i = 0; i < materialCount; i++) { 
+      heightMapShader.setInt("gTextureHeight" + std::to_string(i), 1 + i); 
+      heightMapShader.setInt("gTextureHeight" + std::to_string(i) + "Spec", 6 + i); 
+    }
+   
     // vertex generation
     std::vector<float> vertices;
     unsigned rez = 20;
