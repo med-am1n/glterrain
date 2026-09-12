@@ -8,6 +8,7 @@
 #include <filesystem.h>
 #include <mesh.h>
 
+#include "FastNoiseLite.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -59,31 +60,85 @@ int main()
         return -1;
     }
     // build and compile the shader program
-    Shader heightMapShader("../src/shaders/heightMap.vs", "../src/shaders/heightMap.fs", nullptr, "../src/shaders/heightMap.tcs", "../src/shaders/heightMap.tes"); 
-    unsigned int heightmapTexture;
-    glGenTextures(1, &heightmapTexture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, heightmapTexture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load height map texture
-    int width, height, nChannels;
-    unsigned char *data = stbi_load("../resources/heightmaps/iceland_heightmap.png", &width, &height, &nChannels,  0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    Shader heightMapShader("../src/shaders/heightMap.vs", "../src/shaders/heightMap.fs", nullptr, "../src/shaders/heightMap.tcs", "../src/shaders/heightMap.tes");
 
-        std::cout << "Loaded heightmap of size " << height << " x " << width << std::endl;
-    }
-    else
+ 
+    FastNoiseLite noise;
+
+    noise.SetSeed(1337);
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetFrequency(0.005f);
+
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFractalOctaves(5);
+    noise.SetFractalLacunarity(2.0f);
+    noise.SetFractalGain(0.5f);
+
+    const int width = 1024;
+    const int height = 1024;
+
+    std::vector<float> noiseData(width * height);
+
+    for (int y = 0; y < height; ++y)
     {
-        std::cout << "Failed to load texture" << std::endl;
+        for (int x = 0; x < width; ++x)
+        {
+            float value = noise.GetNoise(
+                static_cast<float>(x),
+                static_cast<float>(y)
+            );
+
+            // [-1, 1] -> [0, 1]
+            value = value * 0.5f + 0.5f;
+
+            noiseData[y * width + x] = value;
+        }
     }
+
+    unsigned int heightmapTexture;
+
+    glGenTextures(1, &heightmapTexture);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, heightmapTexture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, noiseData.data());
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    std::cout << "Generated noise heightmap of size " << width << " x " << height << std::endl;
+
+    // unsigned int heightmapTexture;
+    // glGenTextures(1, &heightmapTexture);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, heightmapTexture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // // set the texture wrapping parameters
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // // set texture filtering parameters
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // // load height map texture
+    // int width, height, nChannels;
+    // unsigned char *data = stbi_load("../resources/heightmaps/iceland_heightmap.png", &width, &height, &nChannels,  0);
+    // if (data)
+    // {
+    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    //     glGenerateMipmap(GL_TEXTURE_2D);
+    //
+    //     std::cout << "Loaded heightmap of size " << height << " x " << width << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "Failed to load texture" << std::endl;
+    // }
     
     
     std::vector<std::string> materialDirs = {
@@ -150,7 +205,7 @@ int main()
         vertices.push_back((j+1) / (float)rez); // v
       }
     }
-    stbi_image_free(data);
+    // stbi_image_free(data);
     
     unsigned int terrainVAO, terrainVBO;
     glGenVertexArrays(1, &terrainVAO);
