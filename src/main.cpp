@@ -73,7 +73,7 @@ int main()
     noise.SetFractalOctaves(5);
     noise.SetFractalLacunarity(2.0f);
     noise.SetFractalGain(0.5f);
-
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXZPlanes);
     const int width = 1024;
     const int height = 1024;
 
@@ -85,7 +85,8 @@ int main()
         {
             float value = noise.GetNoise(
                 static_cast<float>(x),
-                static_cast<float>(y)
+                static_cast<float>(y),
+                0.0f // activates the 3D rotation pipeline, needed to use SetRotationType3D 
             );
 
             // [-1, 1] -> [0, 1]
