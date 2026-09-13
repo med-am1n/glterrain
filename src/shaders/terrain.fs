@@ -13,9 +13,14 @@ uniform float gTextureScale = 20.0;
 // camera
 uniform vec3 viewPos;
 
+uniform vec3 lightDir;
 
 void main()
 {
-    FragColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
+    vec4 brown = vec4(0.914, 0.694, 0.639, 1.0); 
+
+    float diffuse = max(dot(normalize(Normal), normalize(lightDir)), 0.0);
+
+    FragColor = brown * diffuse;
 }
 

@@ -128,6 +128,12 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     terrainShader.use();
     
+    // light
+    float angle = glfwGetTime() * 0.5f; // rotation speed
+    glm::vec3 lightDir(cos(angle), -1.0f, sin(angle));
+    lightDir = glm::normalize(lightDir);
+    terrainShader.setVec3("lightDir", lightDir);   
+    
     terrainShader.setFloat("terrainSize", terrainSize);
     terrainShader.setVec3("viewPos", camera.Position);
     
