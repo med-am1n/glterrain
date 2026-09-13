@@ -59,7 +59,7 @@ int main() {
     return -1;
   }
   // build and compile the shader program
-  Shader heightMapShader(
+  Shader terrainShader(
       "../src/shaders/terrain.vs", "../src/shaders/terrain.fs", nullptr,
       "../src/shaders/terrain.tcs", "../src/shaders/terrain.tes");
   
@@ -126,19 +126,19 @@ int main() {
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    heightMapShader.use();
+    terrainShader.use();
     
-    heightMapShader.setFloat("terrainSize", terrainSize);
-    heightMapShader.setVec3("viewPos", camera.Position);
+    terrainShader.setFloat("terrainSize", terrainSize);
+    terrainShader.setVec3("viewPos", camera.Position);
     
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
     glm::mat4 view = camera.GetViewMatrix();
-    heightMapShader.setMat4("projection", projection);
-    heightMapShader.setMat4("view", view);
+    terrainShader.setMat4("projection", projection);
+    terrainShader.setMat4("view", view);
 
     // world transformation
     glm::mat4 model = glm::mat4(1.0f);
-    heightMapShader.setMat4("model", model);
+    terrainShader.setMat4("model", model);
 
     // render the cube
     glBindVertexArray(terrainVAO);
