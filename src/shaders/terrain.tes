@@ -145,14 +145,6 @@ void main()
 
     Tex = texCoord;
 
-    vec2 noisePos = (texCoord * terrainSize) / 2000.0;
-    
-    vec3 e = fbmd_9(noisePos);
-    
-    vec2 terrainDerivative = 600.0 * e.yz;
-    
-    Height = 600.0 * e.x + 600.0;
-
     vec4 p00 = gl_in[0].gl_Position;
     vec4 p01 = gl_in[1].gl_Position;
     vec4 p10 = gl_in[2].gl_Position;
@@ -162,13 +154,25 @@ void main()
     vec3 vVec = p10.xyz - p00.xyz;
 
     vec3 quadNormal = normalize(cross(vVec, uVec));
-
-    calculateTBN(terrainDerivative);
     
     vec4 p0 = (p01 - p00) * u + p00;
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
+  
     
+    // Transform p.xz from centered terrain coordinates to positive terrain coordinates.
+    // p.xz: [-terrainSize/2, terrainSize/2] -> [0, terrainSize] 
+    
+    vec2 noisePos = (p.xz + terrainSize * 0.5) / 2000.0;
+    
+    vec3 e = fbmd_9(noisePos);
+    
+    vec2 terrainDerivative = 600.0 * e.yz;
+    
+    Height = 600.0 * e.x + 600.0;
+
+    calculateTBN(terrainDerivative);
+
 
     p.xyz += quadNormal * Height;
     FragPos = (model * p).xyz;
