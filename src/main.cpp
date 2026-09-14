@@ -124,9 +124,7 @@ int main() {
       generateTerrain(terrainVBO, terrainSize, rez);
     }
 
-    ImGui::SameLine();
-
-    ImGui::DragFloat("Terrain Size", &terrainSizeInput, 10.0f, 5.0f, 10000.0f);
+    ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 10000.0f);
 
     ImGui::Separator();
     ImGui::Text("Light Direction");
@@ -137,10 +135,11 @@ int main() {
     lightDir = glm::normalize(lightDir);
 
     ImGui::Separator();
+    
 
-    ImGui::DragFloat("Noise Scale", &noiseScale, 1.0f, 10.0f, 2000.0f);
-    ImGui::DragFloat("Height Scale", &heightScale, 1.0f, 0.0f, 2000.0f);
-    ImGui::DragFloat("Height Offset", &heightOffset, 1.0f, -1000.0f, 2000.0f);
+    ImGui::SliderFloat("Noise Scale", &noiseScale, 1.0f, 2000.0f);
+    ImGui::SliderFloat("Height Scale", &heightScale, 1.0f, 2000.0f);
+    ImGui::SliderFloat("Height Offset", &heightOffset, 1, 500.0f);
 
     ImGui::Separator();
 
@@ -311,6 +310,10 @@ void window_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
+  if (ImGui::GetIO().WantCaptureMouse) {
+        firstMouse = true;
+        return;
+    }
   float xpos = static_cast<float>(xposIn);
   float ypos = static_cast<float>(yposIn);
 
