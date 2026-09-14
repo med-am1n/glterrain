@@ -51,7 +51,7 @@ float noiseScale = 500.0f;
 float heightScale = 600.0f;
 float heightOffset = 600.0f;
 float terrainSizeInput = 2048.0f;
-
+glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
 
   std::cout << "Hello, World!" << std::endl;
@@ -115,23 +115,36 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Terrain Controls");
-
-    ImGui::DragFloat("Terrain Size", &terrainSizeInput, 10.0f, 100.0f, 10000.0f);
-
+    
     if (ImGui::Button("Generate Terrain")) {
-        terrainSize = terrainSizeInput;
-        generateTerrain(terrainVBO, terrainSize, rez);
+      terrainSize = terrainSizeInput;
+      generateTerrain(terrainVBO, terrainSize, rez);
     }
+    
+    ImGui::SameLine();
+    
+    ImGui::DragFloat("Terrain Size", &terrainSizeInput, 10.0f, 5.0f,
+                     10000.0f);
 
+    ImGui::Separator();
+    ImGui::Text("Light Direction");
+
+    ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.01f, -1.0f, 1.0f);
+
+    lightDir = glm::normalize(lightDir);
+    
+    ImGui::Separator();
+    
     ImGui::DragFloat("Noise Scale", &noiseScale, 1.0f, 10.0f, 2000.0f);
     ImGui::DragFloat("Height Scale", &heightScale, 1.0f, 0.0f, 2000.0f);
     ImGui::DragFloat("Height Offset", &heightOffset, 1.0f, -1000.0f, 2000.0f);
 
     ImGui::Separator();
 
-    const char* modes[] = {"vertices", "Normals", "Lighting"};
+    const char *modes[] = {"vertices", "Normals", "Lighting"};
 
-    ImGui::Combo("Visualization", &visualizationMode, modes, IM_ARRAYSIZE(modes));
+    ImGui::Combo("Visualization", &visualizationMode, modes,
+                 IM_ARRAYSIZE(modes));
 
     ImGui::End();
 
