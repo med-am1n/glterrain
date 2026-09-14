@@ -48,7 +48,7 @@ float lastFrame = 0.0f;
 // imgui
 int visualizationMode = 0;
 float noiseScale = 500.0f;
-float heightScale = 600.0f;
+float heightScale = 1.0f;
 float heightOffset = 600.0f;
 float terrainSizeInput = 2048.0f;
 int softness = 1;
@@ -86,7 +86,7 @@ int main() {
                        nullptr, "../src/shaders/terrain.tcs",
                        "../src/shaders/terrain.tes");
 
-  float terrainSize = 0;
+  float terrainSize = terrainSizeInput;
   unsigned rez = 20;
   unsigned int terrainVAO, terrainVBO;
   glGenVertexArrays(1, &terrainVAO);
