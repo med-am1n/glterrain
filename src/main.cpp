@@ -12,6 +12,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "imgui.h"
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void window_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -40,6 +44,12 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// imgui
+int visualizationMode = 0;
+float noiseScale = 500.0f;
+float heightScale = 600.0f;
+float heightOffset = 600.0f;
+
 int main() {
 
   std::cout << "Hello, World!" << std::endl;
@@ -58,6 +68,15 @@ int main() {
     std::cout << "Failed to initialize GLAD\n";
     return -1;
   }
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+
+  ImGui::StyleColorsDark();
+
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 410");
+  
   // build and compile the shader program
   Shader terrainShader(
       "../src/shaders/terrain.vs", "../src/shaders/terrain.fs", nullptr,
@@ -124,9 +143,36 @@ int main() {
     // input
     processInput(window);
 
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Terrain Controls");
+
+    ImGui::DragFloat("Noise Scale", &noiseScale, 1.0f, 10.0f, 2000.0f);
+    ImGui::DragFloat("Height Scale", &heightScale, 1.0f, 0.0f, 2000.0f);
+    ImGui::DragFloat("Height Offset", &heightOffset, 1.0f, -1000.0f, 2000.0f);
+
+    ImGui::Separator();
+
+    const char* modes[] = {"vertices", "Normals", "Lighting"};
+
+    ImGui::Combo("Visualization", &visualizationMode, modes, IM_ARRAYSIZE(modes));
+
+    ImGui::End();
+
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     terrainShader.use();
+    
+    if (visualizationMode == 0)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
     
     // light
     float angle = glfwGetTime() * 0.5f; // rotation speed
@@ -134,7 +180,12 @@ int main() {
     lightDir = glm::normalize(lightDir);
     terrainShader.setVec3("lightDir", lightDir);   
     
+    terrainShader.setInt("visualizationMode", visualizationMode);
     terrainShader.setFloat("terrainSize", terrainSize);
+    terrainShader.setFloat("noiseScale", noiseScale);
+    terrainShader.setFloat("heightScale", heightScale);
+    terrainShader.setFloat("heightOffset", heightOffset);
+
     terrainShader.setVec3("viewPos", camera.Position);
     
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
@@ -148,14 +199,22 @@ int main() {
 
     // render the cube
     glBindVertexArray(terrainVAO);
-    //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glDrawArrays(GL_PATCHES, 0, 4 * rez * rez);
+
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
     glfwSwapBuffers(window);
 
     // check and call events
     glfwPollEvents();
   }
-
+  
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+  
   glfwTerminate();
 
   return 0;

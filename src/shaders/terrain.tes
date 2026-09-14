@@ -22,6 +22,9 @@ out vec3 Tangent;
 out vec3 Bitangent;
 
 uniform float terrainSize;
+uniform float noiseScale;
+uniform float heightScale;
+uniform float heightOffset;
 
 float hash1(vec2 p)
 {
@@ -162,14 +165,14 @@ void main()
     
     // Transform p.xz from centered terrain coordinates to positive terrain coordinates.
     // p.xz: [-terrainSize/2, terrainSize/2] -> [0, terrainSize] 
-    
-    vec2 noisePos = (p.xz + terrainSize * 0.5) / 2000.0;
+   
+    vec2 noisePos = (p.xz + terrainSize * 0.5) / noiseScale;
     
     vec3 e = fbmd_9(noisePos);
     
-    vec2 terrainDerivative = 600.0 * e.yz;
+    vec2 terrainDerivative = heightScale * e.yz;
     
-    Height = 600.0 * e.x + 600.0;
+    Height = heightScale * e.x + heightOffset;
 
     calculateTBN(terrainDerivative);
 
