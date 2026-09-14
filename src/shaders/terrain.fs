@@ -6,6 +6,7 @@ in vec3 Normal;
 in vec3 Tangent;
 in vec3 Bitangent;
 in vec3 FragPos;
+in float SlopeLight;
 
 out vec4 FragColor;
 
@@ -19,8 +20,12 @@ uniform float heightOffset;
 
 uniform int visualizationMode;
 
+
 void main()
-{
+{ 
+    vec3 ReversedLightDir = -lightDir;
+    ReversedLightDir.y = 0.0;
+    
     if (visualizationMode == 0)
     {
         float h = (Height - (heightOffset - heightScale)) / (2.0 * heightScale);
@@ -35,23 +40,21 @@ void main()
 
         FragColor = vec4(N * 0.5 + 0.5, 1.0);
     }
-    else
+    else if (visualizationMode == 2)
     {
-        vec3 brown = vec3(
-            0.914,
-            0.694,
-            0.639
-        );
+        vec3 brown = vec3(0.72, 0.82, 0.90);
 
-        float diffuse = max(
-            dot(normalize(Normal), normalize(lightDir)),
-            0.0
-        );
-
-        FragColor = vec4(
-            brown * diffuse,
-            1.0
-        );
+        float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
+        
+        diffuse = max(0.4f, diffuse);
+        FragColor = vec4(brown * diffuse, 1.0);
     }
+    else
+    { 
+      vec3 brown = 0.7 * vec3(0.72, 0.82, 0.90);
+
+      FragColor = vec4(brown * SlopeLight, 1.0);
+
+      }
 }
 

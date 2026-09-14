@@ -5,6 +5,17 @@
 // https://iquilezles.org/articles/fbm/
 // https://iquilezles.org/articles/morenoise/
 
+/*
+ * Slope light implementation Based on: code by Etay Meiri, Copyright 2023.
+ * Original code licensed under the GNU General Public License v3.0 (GPL-3.0-or-later).
+ * This GLSL version is a translation/adaptation of the original code.
+ *
+ * Original author: Etay Meiri
+ * Original source: https://github.com/emeiri/ogldev
+ *
+ * This file is distributed under the terms of the GPL v3.0 or later.
+ */
+
 layout(quads, fractional_odd_spacing, ccw) in;
 
 // uniform sampler2D heightMap;
@@ -20,12 +31,15 @@ out vec3 FragPos;
 out vec3 Normal;
 out vec3 Tangent;
 out vec3 Bitangent;
+out float SlopeLight;
 
 uniform float terrainSize;
 uniform float noiseScale;
 uniform float heightScale;
 uniform float heightOffset;
-
+uniform vec3 lightDir;
+uniform int softness;
+uniform int delta;
 float hash1(vec2 p)
 {
     p = 50.0 * fract(p * 0.3183099);
@@ -131,6 +145,17 @@ void calculateTBN(vec2 terrainDerivative){
     Bitangent = normalize(vec3(0.0, terrainDerivative.y, 1.0));
   } 
 
+
+float GetTerrainHeight(vec2 worldXZ)
+{
+    vec2 noisePos = (worldXZ + terrainSize * 0.5) / noiseScale;
+
+    vec3 e = fbmd_9(noisePos);
+
+    return heightScale * e.x + heightOffset;
+}
+
+
 void main()
 {
     float u = gl_TessCoord.x;
@@ -161,8 +186,130 @@ void main()
     vec4 p0 = (p01 - p00) * u + p00;
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
-  
     
+    // Slope lighting
+    vec3 ReversedLightDir = -lightDir;
+    ReversedLightDir.y = 0.0;
+    ReversedLightDir = normalize(ReversedLightDir);
+
+    vec3 DirX = vec3(1.0, 0.0, 0.0);
+    float dpx = dot(DirX, ReversedLightDir);
+
+    vec3 DirZ = vec3(0.0, 0.0, 1.0);
+    float dpz = dot(DirZ, ReversedLightDir);
+
+    float RadianOf45Degrees = cos(radians(45.0));
+
+    int dx0 = 0;
+    int dx1 = 0;
+    int dz0 = 0;
+    int dz1 = 0;
+
+    float factor = 0.0;
+
+    bool InterpolateOnX = false;
+
+    if (dpz >= RadianOf45Degrees)
+    {
+        dz0 = dz1 = 1;
+        InterpolateOnX = true;
+    }
+    else if (dpz <= -RadianOf45Degrees)
+    {
+        dz0 = dz1 = -1;
+        InterpolateOnX = true;
+    }
+    else
+    {
+        if (dpz >= 0.0)
+        {
+            dz0 = 0;
+            dz1 = 1;
+        }
+        else
+        {
+            dz0 = 0;
+            dz1 = -1;
+        }
+
+        factor = 1.0 - abs(dpz) / RadianOf45Degrees;
+
+        if (dpx >= 0.0)
+        {
+            dx0 = dx1 = 1;
+        }
+        else
+        {
+            dx0 = dx1 = -1;
+        }
+    }
+
+    if (InterpolateOnX)
+    {
+        if (dpx >= 0.0)
+        {
+            dx0 = 0;
+            dx1 = 1;
+        }
+        else
+        {
+            dx0 = 0;
+            dx1 = -1;
+        }
+
+        factor = 1.0 - abs(dpx) / RadianOf45Degrees;
+    }
+
+    Height = GetTerrainHeight(p.xz);
+
+    vec2 Before0 = p.xz + vec2(dx0, dz0) * delta;
+    vec2 Before1 = p.xz + vec2(dx1, dz1) * delta;
+
+    bool V0Inside =
+        Before0.x >= -terrainSize * 0.5 &&
+        Before0.x <   terrainSize * 0.5 &&
+        Before0.y >= -terrainSize * 0.5 &&
+        Before0.y <   terrainSize * 0.5;
+
+    bool V1Inside =
+        Before1.x >= -terrainSize * 0.5 &&
+        Before1.x <   terrainSize * 0.5 &&
+        Before1.y >= -terrainSize * 0.5 &&
+        Before1.y <   terrainSize * 0.5;
+
+    float f = 0.0;
+    float min_brightness = 0.4;
+
+    if (V0Inside && V1Inside)
+    {
+        float HeightBefore0 = GetTerrainHeight(Before0);
+        float HeightBefore1 = GetTerrainHeight(Before1);
+
+        float HeightBefore =
+            HeightBefore0 * factor +
+            (1.0 - factor) * HeightBefore1;
+
+        f = (Height - HeightBefore) / softness;
+    }
+    else if (V0Inside)
+    {
+        float HeightBefore = GetTerrainHeight(Before0);
+
+        f = (Height - HeightBefore) / softness;
+    }
+    else if (V1Inside)
+    {
+        float HeightBefore = GetTerrainHeight(Before1);
+
+        f = (Height - HeightBefore) / softness;
+    }
+    else
+    {
+        f = 1.0;
+    }
+
+    SlopeLight = clamp(f, min_brightness, 1.0);
+
     // Transform p.xz from centered terrain coordinates to positive terrain coordinates.
     // p.xz: [-terrainSize/2, terrainSize/2] -> [0, terrainSize] 
    
@@ -172,7 +319,7 @@ void main()
     
     vec2 terrainDerivative = heightScale * e.yz;
     
-    Height = heightScale * e.x + heightOffset;
+    // Height = heightScale * e.x + heightOffset;
 
     calculateTBN(terrainDerivative);
 
