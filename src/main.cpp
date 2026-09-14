@@ -162,9 +162,6 @@ int main() {
     }
     
     // light
-    float angle = glfwGetTime() * 0.5f; // rotation speed
-    glm::vec3 lightDir(cos(angle), -1.0f, sin(angle));
-    lightDir = glm::normalize(lightDir);
     terrainShader.setVec3("lightDir", lightDir);   
     
     terrainShader.setInt("visualizationMode", visualizationMode);
