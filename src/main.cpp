@@ -50,6 +50,7 @@ int visualizationMode = 0;
 float noiseScale = 500.0f;
 float heightScale = 600.0f;
 float heightOffset = 600.0f;
+float terrainSizeInput = 2048.0f;
 
 int main() {
 
@@ -83,7 +84,7 @@ int main() {
       "../src/shaders/terrain.vs", "../src/shaders/terrain.fs", nullptr,
       "../src/shaders/terrain.tcs", "../src/shaders/terrain.tes");
   
-  float terrainSize = 1024.0f;
+  float terrainSize = 0;
   unsigned rez = 20;
   unsigned int terrainVAO, terrainVBO;
   glGenVertexArrays(1, &terrainVAO);
@@ -114,6 +115,13 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Terrain Controls");
+
+    ImGui::DragFloat("Terrain Size", &terrainSizeInput, 10.0f, 100.0f, 10000.0f);
+
+    if (ImGui::Button("Generate Terrain")) {
+        terrainSize = terrainSizeInput;
+        generateTerrain(terrainVBO, terrainSize, rez);
+    }
 
     ImGui::DragFloat("Noise Scale", &noiseScale, 1.0f, 10.0f, 2000.0f);
     ImGui::DragFloat("Height Scale", &heightScale, 1.0f, 0.0f, 2000.0f);
