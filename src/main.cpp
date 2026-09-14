@@ -25,6 +25,7 @@ GLFWwindow *startGLFW(int width, int height, const char *title,
                       GLFWframebuffersizefun fb_cb, GLFWcursorposfun mouse_cb,
                       GLFWscrollfun scroll_cb);
 unsigned int LoadTexture(const char *path);
+void generateTerrain(unsigned int VBO, float terrainSize, unsigned int rez);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -82,49 +83,14 @@ int main() {
       "../src/shaders/terrain.vs", "../src/shaders/terrain.fs", nullptr,
       "../src/shaders/terrain.tcs", "../src/shaders/terrain.tes");
   
-  const float terrainSize = 1024.0f;
-  const int terrainWidth = 1024;
-  const int terrainHeight = 1024;
-
-  // vertex generation
-  std::vector<float> vertices;
+  float terrainSize = 1024.0f;
   unsigned rez = 20;
-  for (unsigned i = 0; i <= rez - 1; i++) {
-    for (unsigned j = 0; j <= rez - 1; j++) {
-      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * i / (float)rez); // v.x
-      vertices.push_back(0.0f);                          // v.y
-      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * j / (float)rez); // v.z
-      vertices.push_back(i / (float)rez);                 // u
-      vertices.push_back(j / (float)rez);                 // v
-
-      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * (i + 1) / (float)rez); // v.x
-      vertices.push_back(0.0f);                                // v.y
-      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * j / (float)rez); // v.z
-      vertices.push_back((i + 1) / (float)rez);           // u
-      vertices.push_back(j / (float)rez);                 // v
-
-      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * i / (float)rez); // v.x
-      vertices.push_back(0.0f);                          // v.y
-      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * (j + 1) / (float)rez); // v.z
-      vertices.push_back(i / (float)rez);                       // u
-      vertices.push_back((j + 1) / (float)rez);                 // v
-
-      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * (i + 1) / (float)rez); // v.x
-      vertices.push_back(0.0f);                                // v.y
-      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * (j + 1) / (float)rez); // v.z
-      vertices.push_back((i + 1) / (float)rez);                 // u
-      vertices.push_back((j + 1) / (float)rez);                 // v
-    }
-  }
-
   unsigned int terrainVAO, terrainVBO;
   glGenVertexArrays(1, &terrainVAO);
   glBindVertexArray(terrainVAO);
 
   glGenBuffers(1, &terrainVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
+  generateTerrain(terrainVBO, terrainSize, rez);
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
@@ -344,4 +310,42 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+void generateTerrain(unsigned int VBO, float terrainSize, unsigned int rez){
+  const int terrainWidth = terrainSize;
+  const int terrainHeight = terrainSize;
+
+  // vertex generation
+  std::vector<float> vertices;
+  for (unsigned i = 0; i <= rez - 1; i++) {
+    for (unsigned j = 0; j <= rez - 1; j++) {
+      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * i / (float)rez); // v.x
+      vertices.push_back(0.0f);                          // v.y
+      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * j / (float)rez); // v.z
+      vertices.push_back(i / (float)rez);                 // u
+      vertices.push_back(j / (float)rez);                 // v
+
+      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * (i + 1) / (float)rez); // v.x
+      vertices.push_back(0.0f);                                // v.y
+      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * j / (float)rez); // v.z
+      vertices.push_back((i + 1) / (float)rez);           // u
+      vertices.push_back(j / (float)rez);                 // v
+
+      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * i / (float)rez); // v.x
+      vertices.push_back(0.0f);                          // v.y
+      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * (j + 1) / (float)rez); // v.z
+      vertices.push_back(i / (float)rez);                       // u
+      vertices.push_back((j + 1) / (float)rez);                 // v
+
+      vertices.push_back(-terrainWidth / 2.0f + terrainWidth * (i + 1) / (float)rez); // v.x
+      vertices.push_back(0.0f);                                // v.y
+      vertices.push_back(-terrainHeight / 2.0f + terrainHeight * (j + 1) / (float)rez); // v.z
+      vertices.push_back((i + 1) / (float)rez);                 // u
+      vertices.push_back((j + 1) / (float)rez);                 // v
+    }
+  }
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 }
