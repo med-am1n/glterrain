@@ -42,14 +42,20 @@ void main()
     }
     else if (visualizationMode == 2)
     {
-        vec3 brown = vec3(0.65, 0.45, 0.30);
+        vec3 brown = 0.7 * vec3(0.65, 0.45, 0.30);
+        vec3 grass = vec3(0.20, 0.50, 0.12);
         float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
         diffuse = max(0.4f, diffuse);
-        vec3 color = brown * diffuse;
+        
+        float slope = 1.0 - Normal.y;
+        float grassToBrown = smoothstep(0.15, 0.45, slope);
+
+        vec3 terrainColor = mix(grass, brown, grassToBrown);
+        vec3 color = terrainColor * diffuse; 
         
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
-            float fogFactor = exp(-0.00050 * distanceToCamera);
+            float fogFactor = exp(-0.00005 * distanceToCamera);
             vec3 greyColor = vec3(0.769, 0.769, 0.769);
             color = mix(greyColor, color, fogFactor);
           }
@@ -59,16 +65,23 @@ void main()
     else
     { 
         vec3 brown = 0.7 * vec3(0.65, 0.45, 0.30);
-        vec3 color = brown * SlopeLight;
-        
+        vec3 grass = vec3(0.20, 0.50, 0.12);
+
+        float slope = 1.0 - Normal.y;
+        float grassToBrown = smoothstep(0.15, 0.45, slope);
+
+        vec3 terrainColor = mix(grass, brown, grassToBrown);
+        vec3 color = terrainColor * SlopeLight;
+
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
-            float fogFactor = exp(-0.0000050 * distanceToCamera);
+            float fogFactor = exp(-0.00005 * distanceToCamera);
             vec3 greyColor = vec3(0.769, 0.769, 0.769);
             color = mix(greyColor, color, fogFactor);
-          }
+        }
 
         FragColor = vec4(color, 1.0);
+
       }
 }
 
