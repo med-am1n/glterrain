@@ -150,7 +150,10 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Terrain Controls");
-
+    
+    const char *modes[] = {"vertices", "Normals", "Diffuse Light",
+                           "Slope Lighit"};
+    
     if (ImGui::Button("Generate Terrain")) {
       terrainSize = terrainSizeInput;
       generateTerrain(terrainVBO, terrainSize, rez);
@@ -175,25 +178,28 @@ int main() {
 
     ImGui::Separator();
 
-    ImGui::SliderInt("Softness", &softness, 1, 15);
-    ImGui::SliderInt("Delta", &delta, 1, 10);
-    ImGui::Checkbox("Fog Effect", &fog); 
-    if (fog)
-    
-    {
-      ImGui::SliderFloat("Fog Red",   &fogDensityR, 0.0f, 0.001f, "%.6f");
-      ImGui::SliderFloat("Fog Green", &fogDensityG, 0.0f, 0.001f, "%.6f");
-      ImGui::SliderFloat("Fog Blue",  &fogDensityB, 0.0f, 0.001f, "%.6f");
-    }
-    
-    ImGui::Separator();
-
-    const char *modes[] = {"vertices", "Normals", "Diffuse Light",
-                           "Slope Lighit"};
-
     ImGui::Combo("Visualization", &visualizationMode, modes,
                  IM_ARRAYSIZE(modes));
+    
+    if (visualizationMode == 3){
+      ImGui::SliderInt("Softness", &softness, 1, 15);
+      ImGui::SliderInt("Delta", &delta, 1, 10);
+    }
 
+    if (visualizationMode == 3 || visualizationMode == 2){
+    
+      ImGui::Separator();
+      ImGui::Checkbox("Fog Effect", &fog); 
+      
+      if (fog)
+      
+      {
+        ImGui::SliderFloat("Fog Red",   &fogDensityR, 0.0f, 0.001f, "%.6f");
+        ImGui::SliderFloat("Fog Green", &fogDensityG, 0.0f, 0.001f, "%.6f");
+        ImGui::SliderFloat("Fog Blue",  &fogDensityB, 0.0f, 0.001f, "%.6f");
+      }
+    }
+    
     ImGui::End();
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
