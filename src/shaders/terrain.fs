@@ -8,9 +8,15 @@ in vec3 Bitangent;
 in vec3 FragPos;
 in float SlopeLight;
 
+uniform sampler2D texture_diffuse0;
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_diffuse2;
+uniform sampler2D texture_diffuse3;
+uniform sampler2D texture_diffuse4;
+
 out vec4 FragColor;
 
-uniform float gTextureScale;
+uniform float gTextureScale = 1;
 
 uniform vec3 viewPos;
 uniform vec3 lightDir;
@@ -64,14 +70,24 @@ void main()
     }
     else
     { 
-        vec3 brown = 0.7 * vec3(0.65, 0.45, 0.30);
-        vec3 grass = vec3(0.20, 0.50, 0.12);
 
+        vec2 uv = Tex * gTextureScale;
+        
+        vec3 color3 = texture(texture_diffuse3, uv).rgb;
+        vec3 color4 = texture(texture_diffuse4, uv).rgb;
+
+        float heightBlend = smoothstep(500.0, 700.0, Height);
+
+        vec3 flatColor = mix(color3, color4, heightBlend);
+
+
+        vec3 steepColor = texture(texture_diffuse1, uv).rgb;
+        
         float slope = 1.0 - Normal.y;
-        float grassToBrown = smoothstep(0.15, 0.45, slope);
 
-        vec3 terrainColor = mix(grass, brown, grassToBrown);
-        vec3 color = terrainColor * SlopeLight;
+        float steepness = smoothstep(0.15, 0.45, slope);
+
+        vec3 color = mix(flatColor, steepColor, steepness) * SlopeLight;
 
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
