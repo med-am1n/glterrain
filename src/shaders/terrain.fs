@@ -82,22 +82,32 @@ void main()
     }
     else if (visualizationMode == 2)
     {
-        vec3 brown = 0.7 * vec3(0.65, 0.45, 0.30);
-        vec3 grass = vec3(0.20, 0.50, 0.12);
-        float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
-        diffuse = max(0.4f, diffuse);
+        vec2 uv = Tex * gTextureScale;
         
-        float slope = 1.0 - Normal.y;
-        float grassToBrown = smoothstep(0.15, 0.45, slope);
+        vec3 color3 = textureNoTile(texture_diffuse3, uv).rgb;
+        vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
 
-        vec3 terrainColor = mix(grass, brown, grassToBrown);
-        vec3 color = terrainColor * diffuse; 
+        float heightBlend = smoothstep(500.0, 700.0, Height);
+
+        vec3 flatColor = mix(color3, color4, heightBlend);
+
+        vec3 steepColor = textureNoTile(texture_diffuse1, uv).rgb;
+        
+
+        float slope = 1.0 - Normal.y;
+
+        float steepness = smoothstep(0.15, 0.45, slope);
+        
+        float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
+
+        vec3 color = mix(flatColor, steepColor, steepness) * (0.25 + 0.75 * diffuse);
+
         
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
-            float fogFactor = exp(-0.00005 * distanceToCamera);
-            vec3 greyColor = vec3(0.769, 0.769, 0.769);
-            color = mix(greyColor, color, fogFactor);
+            vec3 fogFactor = exp(-fogDensity * distanceToCamera);
+            vec3 fogColor = vec3(0.769, 0.769, 0.769);
+            color = mix(fogColor, color, fogFactor);
           }
         
         FragColor = vec4(color, 1.0);
