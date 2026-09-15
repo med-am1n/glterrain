@@ -317,7 +317,8 @@ void main()
     
     vec3 e = fbmd_9(noisePos);
     
-    vec2 terrainDerivative = heightScale * e.yz;
+    // Convert the derivative from noise space to terrain space. normals are dangerous don't play with that!!
+    vec2 terrainDerivative = (heightScale / noiseScale) * e.yz;
     
     // Height = heightScale * e.x + heightOffset;
 
