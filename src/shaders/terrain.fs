@@ -42,7 +42,7 @@ void main()
     }
     else if (visualizationMode == 2)
     {
-        vec3 brown = vec3(0.914, 0.694, 0.639);
+        vec3 brown = vec3(0.65, 0.45, 0.30);
         float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
         diffuse = max(0.4f, diffuse);
         vec3 color = brown * diffuse;
@@ -50,7 +50,7 @@ void main()
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
             float fogFactor = exp(-0.00050 * distanceToCamera);
-            vec3 greyColor = vec3(0.5);
+            vec3 greyColor = vec3(0.769, 0.769, 0.769);
             color = mix(greyColor, color, fogFactor);
           }
         
@@ -58,13 +58,13 @@ void main()
     }
     else
     { 
-        vec3 brown = 0.7 * vec3(0.914, 0.694, 0.639);
+        vec3 brown = 0.7 * vec3(0.65, 0.45, 0.30);
         vec3 color = brown * SlopeLight;
         
         if(fog){
             float distanceToCamera = length(FragPos - viewPos);
-            float fogFactor = exp(-0.00050 * distanceToCamera);
-            vec3 greyColor = vec3(0.5);
+            float fogFactor = exp(-0.0000050 * distanceToCamera);
+            vec3 greyColor = vec3(0.769, 0.769, 0.769);
             color = mix(greyColor, color, fogFactor);
           }
 
