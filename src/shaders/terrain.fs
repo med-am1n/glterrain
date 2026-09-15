@@ -26,6 +26,7 @@ uniform float heightOffset;
 
 uniform int visualizationMode;
 uniform bool fog;
+uniform vec3 fogDensity;
 
 // Based on code originally written by Inigo Quilez, © 2015.
 // More info here: https://iquilezles.org/articles/texturerepetition
@@ -122,12 +123,16 @@ void main()
 
         vec3 color = mix(flatColor, steepColor, steepness) * SlopeLight;
 
-        if(fog){
+        if (fog) {
             float distanceToCamera = length(FragPos - viewPos);
-            float fogFactor = exp(-0.00005 * distanceToCamera);
-            vec3 greyColor = vec3(0.769, 0.769, 0.769);
-            color = mix(greyColor, color, fogFactor);
+
+            vec3 fogFactor = exp(-fogDensity * distanceToCamera);
+
+            vec3 fogColor = vec3(0.769, 0.769, 0.769);
+
+            color = mix(fogColor, color, fogFactor);
         }
+
 
         FragColor = vec4(color, 1.0);
 
