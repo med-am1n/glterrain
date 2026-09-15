@@ -42,7 +42,7 @@ struct DirLight {
 
 uniform DirLight dirLight;
 
-vec4 calculateDirectLight(vec3 baseColor, vec3 specularColor){
+vec4 calculateDirectLight(vec3 baseColor){
 	// ambient
     vec3 ambient = dirLight.ambient * baseColor;
 	// diffuse
@@ -51,75 +51,25 @@ vec4 calculateDirectLight(vec3 baseColor, vec3 specularColor){
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = dirLight.diffuse * diff * baseColor;
 
-	// specular
-	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec3 specular = dirLight.specular * spec * specularColor.r;
-	
-  return vec4(ambient + diffuse + specular, 1.0);
+  return vec4(ambient + diffuse, 1.0);
 }
 
 void main()
 {
-    vec2 uv = Tex * gTextureScale;
-    vec4 color;
-    vec3 specularColor;
-    if (Height < gHeight0)
-    {
-        color = texture(texture_diffuse0, uv);
-        specularColor = texture(texture_specular0, uv).rgb;
-    }
-    else if (Height < gHeight1)
-    {
-        float factor = (Height - gHeight0) / (gHeight1 - gHeight0);
-        vec4 color0 = texture(texture_diffuse0, uv);
-        vec4 color1 = texture(texture_diffuse1, uv);
-        color = mix(color0, color1, clamp(factor, 0.0, 1.0));
-        // Specular
-        vec3 spec0 = texture(texture_specular0, uv).rgb;
-        vec3 spec1 = texture(texture_specular1, uv).rgb;
-        specularColor = mix(spec0, spec1, factor);
-    }
-    else if (Height < gHeight2)
-    {
-        float factor = (Height - gHeight1) / (gHeight2 - gHeight1);
-        vec4 color0 = texture(texture_diffuse1, uv);
-        vec4 color1 = texture(texture_diffuse2, uv);
-        color = mix(color0, color1, clamp(factor, 0.0, 1.0));
-        // Specular
-        vec3 spec0 = texture(texture_specular1, uv).rgb;
-        vec3 spec1 = texture(texture_specular2, uv).rgb;
-        specularColor = mix(spec0, spec1, factor);
-    }
-    else if (Height < gHeight3)
-    {
-        float factor = (Height - gHeight2) / (gHeight3 - gHeight2);
-        vec4 color0 = texture(texture_diffuse2, uv);
-        vec4 color1 = texture(texture_diffuse3, uv);
-        color = mix(color0, color1, clamp(factor, 0.0, 1.0));
-        // Specular
-        vec3 spec0 = texture(texture_specular2, uv).rgb;
-        vec3 spec1 = texture(texture_specular3, uv).rgb;
-        specularColor = mix(spec0, spec1, factor);
-    }
-    else if (Height < gHeight4)
-    {
-        float factor = (Height - gHeight3) / (gHeight4 - gHeight3);
-        vec4 color0 = texture(texture_diffuse3, uv);
-        vec4 color1 = texture(texture_diffuse4, uv);
-        color = mix(color0, color1, clamp(factor, 0.0, 1.0));
-        // Specular
-        vec3 spec0 = texture(texture_specular3, uv).rgb;
-        vec3 spec1 = texture(texture_specular4, uv).rgb;
-        specularColor = mix(spec0, spec1, factor);
-    }
-    else
-    {
-        color = texture(texture_diffuse4, uv);
-        specularColor = texture(texture_specular4, uv).rgb;
-    }
+      vec2 uv = Tex * gTextureScale;
 
-      FragColor = calculateDirectLight(color.rgb, specularColor);
+      vec3 N = normalize(Normal);
+
+      float slope = 1.0 - N.y;
+
+      float steepness = smoothstep(0.15, 0.45, slope);
+
+      vec3 flatColor = texture(texture_diffuse2, uv).rgb;
+      vec3 steepColor = texture(texture_diffuse1, uv).rgb;
+
+      vec3 color = mix(flatColor, steepColor, steepness);
+
+      FragColor = calculateDirectLight(color.rgb);
+
 }
 
