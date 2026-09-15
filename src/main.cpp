@@ -53,6 +53,7 @@ float heightOffset = 600.0f;
 float terrainSizeInput = 2048.0f;
 int softness = 1;
 int delta = 1;
+bool fog = false;
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
 
@@ -145,7 +146,7 @@ int main() {
 
     ImGui::SliderInt("Softness", &softness, 1, 15);
     ImGui::SliderInt("Delta", &delta, 1, 10);
-
+    ImGui::Checkbox("Fog Effect", &fog); 
     ImGui::Separator();
 
     const char *modes[] = {"vertices", "Normals", "Diffuse Light",
@@ -176,7 +177,7 @@ int main() {
     terrainShader.setFloat("heightOffset", heightOffset);
     terrainShader.setInt("softness", softness);
     terrainShader.setInt("delta", delta);
-
+    terrainShader.setBool("fog", fog);
     terrainShader.setVec3("viewPos", camera.Position);
 
     glm::mat4 projection =
