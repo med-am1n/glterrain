@@ -16,7 +16,7 @@ uniform sampler2D texture_diffuse4;
 
 out vec4 FragColor;
 
-uniform float gTextureScale = 1;
+uniform float gTextureScale = 20;
 
 uniform vec3 viewPos;
 uniform vec3 lightDir;
@@ -26,6 +26,39 @@ uniform float heightOffset;
 
 uniform int visualizationMode;
 uniform bool fog;
+
+// Based on code originally written by Inigo Quilez, © 2015.
+// More info here: https://iquilezles.org/articles/texturerepetition
+float sumVec3(vec3 v)
+{
+    return v.x + v.y + v.z;
+}
+
+float greyNosie(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+vec3 textureNoTile(sampler2D samp, vec2 uv)
+{
+    vec2 x = uv; 
+    
+    float k = greyNosie(0.005 * x);
+    
+    float index = k * 8.0;
+    float i = floor(index);
+    float f = fract(index);
+
+    vec2 offa = sin(vec2(3.0, 7.0) * (i + 0.0));
+    vec2 offb = sin(vec2(3.0, 7.0) * (i + 1.0));
+
+    vec2 dx = dFdx(uv);
+    vec2 dy = dFdy(uv);
+
+    vec3 cola = textureGrad(samp, uv + offa, dx, dy).rgb;
+    vec3 colb = textureGrad(samp, uv + offb, dx, dy).rgb;
+
+    return mix(cola, colb, smoothstep(0.2, 0.8, f - 0.1 * sumVec3(cola - colb)));
+}
 
 void main()
 { 
@@ -73,15 +106,15 @@ void main()
 
         vec2 uv = Tex * gTextureScale;
         
-        vec3 color3 = texture(texture_diffuse3, uv).rgb;
-        vec3 color4 = texture(texture_diffuse4, uv).rgb;
+        vec3 color3 = textureNoTile(texture_diffuse3, uv).rgb;
+        vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
 
         float heightBlend = smoothstep(500.0, 700.0, Height);
 
         vec3 flatColor = mix(color3, color4, heightBlend);
 
 
-        vec3 steepColor = texture(texture_diffuse1, uv).rgb;
+        vec3 steepColor = textureNoTile(texture_diffuse1, uv).rgb;
         
         float slope = 1.0 - Normal.y;
 
