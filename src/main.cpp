@@ -57,6 +57,7 @@ bool fog = false;
 float fogDensityR = 0.00005f;
 float fogDensityG = 0.00005f;
 float fogDensityB = 0.00005f;
+bool erosion = false;
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
 
@@ -172,6 +173,7 @@ int main() {
     ImGui::Separator();
     
 
+    ImGui::Checkbox("Erosion", &erosion); 
     ImGui::SliderFloat("Noise Scale", &noiseScale, 1.0f, 2000.0f);
     ImGui::SliderFloat("Height Scale", &heightScale, 1.0f, 2000.0f);
     ImGui::SliderFloat("Height Offset", &heightOffset, 1, 500.0f);
@@ -217,6 +219,7 @@ int main() {
 
     terrainShader.setInt("visualizationMode", visualizationMode);
     terrainShader.setFloat("terrainSize", terrainSize);
+    terrainShader.setFloat("erosion", erosion);
     terrainShader.setFloat("noiseScale", noiseScale);
     terrainShader.setFloat("heightScale", heightScale);
     terrainShader.setFloat("heightOffset", heightOffset);
