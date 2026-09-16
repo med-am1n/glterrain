@@ -92,105 +92,68 @@ vec3 noised(vec2 x)
 
 
 const mat2 m2 = mat2(
-     0.80,  0.60,
-    -0.60,  0.80
-);
-
-const mat2 m2i = mat2(
      0.80, -0.60,
      0.60,  0.80
 );
 
+const mat2 m2i = mat2(
+     0.80,  0.60,
+    -0.60,  0.80
+);
 
-vec3 fbmd_9(vec2 x)
+
+float terrainHeight(vec2 x)
 {
-    float f = 1.9;
-    float s = 0.55;
-
     float value = 0.0;
-    float amplitude = 0.5;
+    float amplitude = 1.0;
 
-    vec2 derivative = vec2(0.0);
+    vec2 d = vec2(0.0);
 
-    mat2 m = mat2(1.0);
-
-
-    for(int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++)
     {
         vec3 n = noised(x);
-        
-        vec2 combinedDerivative = derivative + n.yz;
-        float influence = 1.0 / (1.0 + erosionScale * length(combinedDerivative));
-        
-        // height
-        value += amplitude * influence * n.x;
-          
-        // analytical derivative
-        derivative += amplitude * m * n.yz;
 
-        amplitude *= s;
+        d += n.yz;
 
-        // next octave
-        x = f * m2 * x;
+        float influence = 1.0 / (1.0 + erosionScale * dot(d, d));
 
-        // derivative transformation
-        m = f * m2i * m;
+        value += amplitude * n.x * influence;
+
+        amplitude *= 0.5;
+        x = 2.0 * m2 * x;
     }
 
-
-    return vec3(value, derivative);
+    return value;
 }
 
 
-void calculateTBN(vec2 terrainDerivative){
-    Normal = normalize(vec3(-terrainDerivative.x, 1.0, -terrainDerivative.y));
-    Tangent = normalize(vec3(1.0, terrainDerivative.x, 0.0));
-    Bitangent = normalize(vec3(0.0, terrainDerivative.y, 1.0));
-  } 
-
-
-float GetTerrainHeight(vec2 worldXZ)
+float getTerrainHeight(vec2 p)
 {
-    vec2 noisePos = (worldXZ + terrainSize * 0.5) / noiseScale;
+    vec2 noisePos = (p + terrainSize * 0.5) / noiseScale;
 
-    vec3 e = fbmd_9(noisePos);
+    float e = terrainHeight(noisePos);
 
-    return heightScale * e.x + heightOffset;
+    return heightScale * e + heightOffset;
 }
 
-
-void main()
+vec3 calcTerrainNormal(vec4 p)
 {
-    float u = gl_TessCoord.x;
-    float v = gl_TessCoord.y;
+    float eps = 0.001;
 
-    vec2 t00 = TextureCoord[0];
-    vec2 t01 = TextureCoord[1];
-    vec2 t10 = TextureCoord[2];
-    vec2 t11 = TextureCoord[3];
+    float hL = getTerrainHeight(p.xz - vec2(eps, 0.0));
+    float hR = getTerrainHeight(p.xz + vec2(eps, 0.0));
+    float hD = getTerrainHeight(p.xz - vec2(0.0, eps));
+    float hU = getTerrainHeight(p.xz + vec2(0.0, eps));
 
-    vec2 t0 = (t01 - t00) * u + t00;
-    vec2 t1 = (t11 - t10) * u + t10;
+    return normalize(vec3(
+        hL - hR,
+        2.0 * eps,
+        hD - hU
+    ));
+}
+ 
+float calcSlopeLight(vec4 p){
 
-    vec2 texCoord = (t1 - t0) * v + t0;
-
-    Tex = texCoord;
-
-    vec4 p00 = gl_in[0].gl_Position;
-    vec4 p01 = gl_in[1].gl_Position;
-    vec4 p10 = gl_in[2].gl_Position;
-    vec4 p11 = gl_in[3].gl_Position;
-
-    vec3 uVec = p01.xyz - p00.xyz;
-    vec3 vVec = p10.xyz - p00.xyz;
-
-    vec3 quadNormal = normalize(cross(vVec, uVec));
-    
-    vec4 p0 = (p01 - p00) * u + p00;
-    vec4 p1 = (p11 - p10) * u + p10;
-    vec4 p = (p1 - p0) * v + p0;
-    
-    // Slope lighting
     vec3 ReversedLightDir = -lightDir;
     ReversedLightDir.y = 0.0;
     ReversedLightDir = normalize(ReversedLightDir);
@@ -263,8 +226,6 @@ void main()
         factor = 1.0 - abs(dpx) / RadianOf45Degrees;
     }
 
-    Height = GetTerrainHeight(p.xz);
-
     vec2 Before0 = p.xz + vec2(dx0, dz0) * delta;
     vec2 Before1 = p.xz + vec2(dx1, dz1) * delta;
 
@@ -285,8 +246,8 @@ void main()
 
     if (V0Inside && V1Inside)
     {
-        float HeightBefore0 = GetTerrainHeight(Before0);
-        float HeightBefore1 = GetTerrainHeight(Before1);
+        float HeightBefore0 = getTerrainHeight(Before0);
+        float HeightBefore1 = getTerrainHeight(Before1);
 
         float HeightBefore =
             HeightBefore0 * factor +
@@ -296,13 +257,13 @@ void main()
     }
     else if (V0Inside)
     {
-        float HeightBefore = GetTerrainHeight(Before0);
+        float HeightBefore = getTerrainHeight(Before0);
 
         f = (Height - HeightBefore) / softness;
     }
     else if (V1Inside)
     {
-        float HeightBefore = GetTerrainHeight(Before1);
+        float HeightBefore = getTerrainHeight(Before1);
 
         f = (Height - HeightBefore) / softness;
     }
@@ -310,23 +271,46 @@ void main()
     {
         f = 1.0;
     }
-
-    SlopeLight = clamp(f, min_brightness, 1.0);
-
-    // Transform p.xz from centered terrain coordinates to positive terrain coordinates.
-    // p.xz: [-terrainSize/2, terrainSize/2] -> [0, terrainSize] 
-   
-    vec2 noisePos = (p.xz + terrainSize * 0.5) / noiseScale;
     
-    vec3 e = fbmd_9(noisePos);
-    
-    // Convert the derivative from noise space to terrain space. normals are dangerous don't play with that!!
-    vec2 terrainDerivative = (heightScale / noiseScale) * e.yz;
-    
-    // Height = heightScale * e.x + heightOffset;
+    return clamp(f, min_brightness, 1.0); 
+  
+  }
 
-    calculateTBN(terrainDerivative);
+void main()
+{
+    float u = gl_TessCoord.x;
+    float v = gl_TessCoord.y;
 
+    vec2 t00 = TextureCoord[0];
+    vec2 t01 = TextureCoord[1];
+    vec2 t10 = TextureCoord[2];
+    vec2 t11 = TextureCoord[3];
+
+    vec2 t0 = (t01 - t00) * u + t00;
+    vec2 t1 = (t11 - t10) * u + t10;
+
+    vec2 texCoord = (t1 - t0) * v + t0;
+
+    Tex = texCoord;
+
+    vec4 p00 = gl_in[0].gl_Position;
+    vec4 p01 = gl_in[1].gl_Position;
+    vec4 p10 = gl_in[2].gl_Position;
+    vec4 p11 = gl_in[3].gl_Position;
+
+    vec3 uVec = p01.xyz - p00.xyz;
+    vec3 vVec = p10.xyz - p00.xyz;
+
+    vec3 quadNormal = normalize(cross(vVec, uVec));
+    
+    vec4 p0 = (p01 - p00) * u + p00;
+    vec4 p1 = (p11 - p10) * u + p10;
+    vec4 p = (p1 - p0) * v + p0;
+    
+    Height = getTerrainHeight(p.xz);
+    Normal = calcTerrainNormal(p);
+
+    SlopeLight = calcSlopeLight(p);
 
     p.xyz += quadNormal * Height;
     FragPos = (model * p).xyz;
