@@ -84,14 +84,14 @@ void main()
     {
         vec2 uv = Tex * gTextureScale;
         
-        vec3 color3 = textureNoTile(texture_diffuse3, uv).rgb;
+        vec3 color3 = textureNoTile(texture_diffuse2, uv).rgb;
         vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
 
         float heightBlend = smoothstep(500.0, 700.0, Height);
 
         vec3 flatColor = mix(color3, color4, heightBlend);
 
-        vec3 steepColor = textureNoTile(texture_diffuse1, uv).rgb;
+        vec3 steepColor = textureNoTile(texture_diffuse0, uv).rgb;
         
 
         float slope = 1.0 - Normal.y;
@@ -117,7 +117,7 @@ void main()
 
         vec2 uv = Tex * gTextureScale;
         
-        vec3 color3 = textureNoTile(texture_diffuse3, uv).rgb;
+        vec3 color3 = textureNoTile(texture_diffuse2, uv).rgb;
         vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
 
         float heightBlend = smoothstep(500.0, 700.0, Height);
@@ -125,7 +125,7 @@ void main()
         vec3 flatColor = mix(color3, color4, heightBlend);
 
 
-        vec3 steepColor = textureNoTile(texture_diffuse1, uv).rgb;
+        vec3 steepColor = textureNoTile(texture_diffuse0, uv).rgb;
         
         float slope = 1.0 - Normal.y;
 

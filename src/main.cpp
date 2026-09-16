@@ -127,7 +127,7 @@ int main() {
     
 
     for (int i = 0; i < materialCount; i++) { 
-      glActiveTexture(GL_TEXTURE1 + i); glBindTexture(GL_TEXTURE_2D, heightTextures[i]); 
+      glActiveTexture(GL_TEXTURE0 + i); glBindTexture(GL_TEXTURE_2D, heightTextures[i]); 
       //glActiveTexture(GL_TEXTURE5 + i); glBindTexture(GL_TEXTURE_2D, specTextures[i]); 
     }
 
