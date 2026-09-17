@@ -6,7 +6,6 @@ in vec3 Normal;
 in vec3 Tangent;
 in vec3 Bitangent;
 in vec3 FragPos;
-in float SlopeLight;
 
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_diffuse1;
@@ -112,40 +111,5 @@ void main()
         
         FragColor = vec4(color, 1.0);
     }
-    else
-    { 
-
-        vec2 uv = Tex * gTextureScale;
-        
-        vec3 color3 = textureNoTile(texture_diffuse2, uv).rgb;
-        vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
-
-        float heightBlend = smoothstep(500.0, 700.0, Height);
-
-        vec3 flatColor = mix(color3, color4, heightBlend);
-
-
-        vec3 steepColor = textureNoTile(texture_diffuse0, uv).rgb;
-        
-        float slope = 1.0 - Normal.y;
-
-        float steepness = smoothstep(0.15, 0.45, slope);
-
-        vec3 color = mix(flatColor, steepColor, steepness) * SlopeLight;
-
-        if (fog) {
-            float distanceToCamera = length(FragPos - viewPos);
-
-            vec3 fogFactor = exp(-fogDensity * distanceToCamera);
-
-            vec3 fogColor = vec3(0.769, 0.769, 0.769);
-
-            color = mix(fogColor, color, fogFactor);
-        }
-
-
-        FragColor = vec4(color, 1.0);
-
-      }
-}
+  }
 

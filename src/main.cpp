@@ -152,15 +152,14 @@ int main() {
 
     ImGui::Begin("Terrain Controls");
     
-    const char *modes[] = {"vertices", "Normals", "Diffuse Light",
-                           "Slope Lighit"};
+    const char *modes[] = {"vertices", "Normals", "Diffuse Light"};
     
     if (ImGui::Button("Generate Terrain")) {
       terrainSize = terrainSizeInput;
       generateTerrain(terrainVBO, terrainSize, rez);
     }
 
-    ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 10000.0f);
+    ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 500000.0f);
 
     ImGui::Separator();
     ImGui::Text("Light Direction");
