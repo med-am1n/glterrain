@@ -159,7 +159,7 @@ int main() {
       generateTerrain(terrainVBO, terrainSize, rez);
     }
 
-    ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 500000.0f);
+    ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 20000.0f);
 
     ImGui::Separator();
     ImGui::Text("Light Direction");
@@ -172,7 +172,7 @@ int main() {
     ImGui::Separator();
     
 
-    ImGui::SliderFloat("Erosion scale", &erosionScale, 0.0f, 5.0f);
+    ImGui::SliderFloat("Erosion scale", &erosionScale, 0.0f, 1.0f);
     ImGui::SliderFloat("Noise Scale", &noiseScale, 1.0f, 2000.0f);
     ImGui::SliderFloat("Height Scale", &heightScale, 1.0f, 2000.0f);
     ImGui::SliderFloat("Height Offset", &heightOffset, 1, 500.0f);
