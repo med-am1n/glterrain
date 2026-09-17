@@ -30,6 +30,8 @@ uniform vec3 lightDir;
 uniform int softness;
 uniform int delta;
 uniform float erosionScale;
+uniform int shadowSteps;
+
 float hash1(vec2 p)
 {
     p = 50.0 * fract(p * 0.3183099);
@@ -148,7 +150,7 @@ float softShadow(vec3 ro, vec3 rd)
 
     float t = 0.05;
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < shadowSteps; i++)
     {
         vec3 p = ro + rd * t;
 

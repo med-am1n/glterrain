@@ -58,6 +58,9 @@ float fogDensityR = 0.00005f;
 float fogDensityG = 0.00005f;
 float fogDensityB = 0.00005f;
 float erosionScale =0.0f;
+bool shadow = false;
+int shadowSteps = 0 ;
+
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
 
@@ -199,6 +202,14 @@ int main() {
         ImGui::SliderFloat("Fog Green", &fogDensityG, 0.0f, 0.001f, "%.6f");
         ImGui::SliderFloat("Fog Blue",  &fogDensityB, 0.0f, 0.001f, "%.6f");
       }
+      ImGui::Separator();
+      ImGui::Checkbox("Shadow Effect", &shadow); 
+      
+      if (shadow)
+      
+      {
+        ImGui::SliderInt("Shadow Steps", &shadowSteps, 0, 64);
+      }
     }
     
     ImGui::End();
@@ -226,6 +237,7 @@ int main() {
     terrainShader.setInt("delta", delta);
     terrainShader.setBool("fog", fog);
     terrainShader.setVec3("fogDensity", glm::vec3(fogDensityR, fogDensityG, fogDensityB));
+    terrainShader.setInt("shadowSteps", shadowSteps);
     terrainShader.setVec3("viewPos", camera.Position);
 
     glm::mat4 projection =
