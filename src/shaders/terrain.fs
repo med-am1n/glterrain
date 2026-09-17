@@ -83,7 +83,7 @@ void main()
     {
         vec2 uv = Tex * gTextureScale;
         
-        vec3 color3 = textureNoTile(texture_diffuse2, uv).rgb;
+        vec3 color3 = textureNoTile(texture_diffuse4, uv).rgb;
         vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
 
         float heightBlend = smoothstep(500.0, 700.0, Height);
@@ -92,14 +92,36 @@ void main()
 
         vec3 steepColor = textureNoTile(texture_diffuse0, uv).rgb;
         
-
         float slope = 1.0 - Normal.y;
 
         float steepness = smoothstep(0.15, 0.45, slope);
-        
-        float diffuse = max(dot(normalize(Normal), normalize(ReversedLightDir)), 0.0);
 
-        vec3 color = mix(flatColor, steepColor, steepness) * (0.25 + 0.75 * diffuse);
+        vec3 terrainColor = mix(flatColor, steepColor, steepness);
+
+        vec3 N = normalize(Normal);
+        vec3 L = normalize(ReversedLightDir);
+        vec3 V = normalize(viewPos - FragPos);
+
+        // Direct sunlight
+        float diffuse = max(dot(N, L), 0.0);
+
+        // Ambient sky light
+        float ambient = clamp(0.5 + 0.5 * N.y, 0.0, 1.0);
+
+        // Back light
+        vec3 backDir = normalize(vec3(L.x, 0.0, -L.z));
+
+        float back = clamp( 0.2 + 0.8 * dot(backDir, N), 0.0, 1.0);
+
+        vec3 lighting = vec3(0.0);
+
+        lighting += diffuse * vec3(1.0, 0.65, 0.40);
+
+        lighting += ambient * vec3(0.40, 0.60, 1.00);
+
+        lighting += back * vec3(0.40, 0.50, 0.60);
+
+        vec3 color = terrainColor * lighting;
 
         
         if(fog){
