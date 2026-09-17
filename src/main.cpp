@@ -237,6 +237,7 @@ int main() {
     terrainShader.setInt("delta", delta);
     terrainShader.setBool("fog", fog);
     terrainShader.setVec3("fogDensity", glm::vec3(fogDensityR, fogDensityG, fogDensityB));
+    terrainShader.setBool("shadow", shadow);
     terrainShader.setInt("shadowSteps", shadowSteps);
     terrainShader.setVec3("viewPos", camera.Position);
 

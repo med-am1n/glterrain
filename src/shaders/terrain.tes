@@ -30,6 +30,7 @@ uniform vec3 lightDir;
 uniform int softness;
 uniform int delta;
 uniform float erosionScale;
+uniform bool shadow;
 uniform int shadowSteps;
 
 float hash1(vec2 p)
@@ -213,17 +214,19 @@ void main()
 
     vec3 L = normalize(-lightDir);
 
-    Shadow = 1.0;
-
     float diffuse =
         max(dot(normalize(Normal), L), 0.0);
 
-    if (diffuse > 0.01)
-    {
-        Shadow = softShadow(
-            TerrainPos + L * 0.5,
-            L
-        );
+    Shadow = 1.0;
+    
+    if (shadow){ 
+        if (diffuse > 0.01)
+        {
+            Shadow = softShadow(
+                TerrainPos + L * 0.5,
+                L
+            );
+        }
     }
 
     FragPos = (model * p).xyz;
