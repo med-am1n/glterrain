@@ -20,6 +20,7 @@ out vec3 FragPos;
 out vec3 Normal;
 out vec3 Tangent;
 out vec3 Bitangent;
+out float Shadow;
 
 uniform float terrainSize;
 uniform float noiseScale;
@@ -140,6 +141,36 @@ vec3 calcTerrainNormal(vec4 p)
     ));
 }
  
+
+float softShadow(vec3 ro, vec3 rd)
+{
+    float result = 1.0;
+
+    float t = 0.05;
+
+    for (int i = 0; i < 64; i++)
+    {
+        vec3 p = ro + rd * t;
+
+        float terrainY = getTerrainHeight(p.xz);
+
+        float h = p.y - terrainY;
+
+        result = min(result, 16.0 * h / t);
+
+        t += max(h, 0.5);
+
+        if (result < 0.001)
+            break;
+
+        if (t > 500.0)
+            break;
+    }
+
+    return clamp(result, 0.0, 1.0);
+}
+
+
 void main()
 {
     float u = gl_TessCoord.x;
@@ -175,6 +206,24 @@ void main()
     Normal = calcTerrainNormal(p);
 
     p.xyz += quadNormal * Height;
+
+    vec3 TerrainPos = p.xyz;
+
+    vec3 L = normalize(-lightDir);
+
+    Shadow = 1.0;
+
+    float diffuse =
+        max(dot(normalize(Normal), L), 0.0);
+
+    if (diffuse > 0.01)
+    {
+        Shadow = softShadow(
+            TerrainPos + L * 0.5,
+            L
+        );
+    }
+
     FragPos = (model * p).xyz;
     gl_Position = projection * view * model * p;
 }

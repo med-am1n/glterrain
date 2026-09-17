@@ -6,6 +6,7 @@ in vec3 Normal;
 in vec3 Tangent;
 in vec3 Bitangent;
 in vec3 FragPos;
+in float Shadow;
 
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_diffuse1;
@@ -115,7 +116,7 @@ void main()
 
         vec3 lighting = vec3(0.0);
 
-        lighting += diffuse * vec3(1.0, 0.65, 0.40);
+        lighting += diffuse * Shadow * vec3(1.0, 0.65, 0.40); 
 
         lighting += ambient * vec3(0.40, 0.60, 1.00);
 
