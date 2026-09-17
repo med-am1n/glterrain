@@ -60,6 +60,7 @@ float fogDensityB = 0.00005f;
 float erosionScale =0.0f;
 bool shadow = false;
 int shadowSteps = 0 ;
+float tessLevel = 32;
 
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
@@ -163,7 +164,7 @@ int main() {
     }
 
     ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 20000.0f);
-
+    ImGui::SliderFloat("Tesselation level", &tessLevel, 16.0f, 64.0f);
     ImGui::Separator();
     ImGui::Text("Light Direction");
 
@@ -229,6 +230,7 @@ int main() {
 
     terrainShader.setInt("visualizationMode", visualizationMode);
     terrainShader.setFloat("terrainSize", terrainSize);
+    terrainShader.setFloat("tessLevel", tessLevel);
     terrainShader.setFloat("erosionScale", erosionScale);
     terrainShader.setFloat("noiseScale", noiseScale);
     terrainShader.setFloat("heightScale", heightScale);
