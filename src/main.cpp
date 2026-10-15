@@ -31,7 +31,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 int windowWidth = SCR_WIDTH;
 int windowHeight = SCR_HEIGHT;
-unsigned int cameraSpeed = 100;
+unsigned int cameraSpeed = 400;
 const unsigned int NUM_PATCH_PTS = 4;
 // camera
 Camera camera(glm::vec3(67.0f, 627.5f, 169.9f), glm::vec3(0.0f, 1.0f, 0.0f),
@@ -59,7 +59,6 @@ float fogDensityG = 0.00005f;
 float fogDensityB = 0.00005f;
 float erosionScale =0.0f;
 bool shadow = false;
-int shadowSteps = 0 ;
 float tessLevel = 32;
 
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
@@ -209,7 +208,7 @@ int main() {
       if (shadow)
       
       {
-        ImGui::SliderInt("Shadow Steps", &shadowSteps, 0, 64);
+        ImGui::SliderInt("Shadow Softness", &softness, 4, 32);
       }
     }
     
@@ -240,7 +239,6 @@ int main() {
     terrainShader.setBool("fog", fog);
     terrainShader.setVec3("fogDensity", glm::vec3(fogDensityR, fogDensityG, fogDensityB));
     terrainShader.setBool("shadow", shadow);
-    terrainShader.setInt("shadowSteps", shadowSteps);
     terrainShader.setVec3("viewPos", camera.Position);
 
     glm::mat4 projection =
