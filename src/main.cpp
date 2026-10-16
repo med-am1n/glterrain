@@ -51,7 +51,7 @@ float noiseScale = 500.0f;
 float heightScale = 1.0f;
 float heightOffset = 600.0f;
 float terrainSizeInput = 2048.0f;
-int softness = 1;
+int softness = 4;
 int delta = 1;
 bool fog = false;
 float fogDensityR = 0.00005f;
@@ -205,7 +205,7 @@ int main() {
       if (shadow)
       
       {
-        ImGui::SliderInt("Shadow Softness", &softness, 4, 32);
+        ImGui::SliderInt("Shadow Softness", &softness, 1, 32);
       }
     }
     
