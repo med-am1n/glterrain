@@ -60,6 +60,8 @@ float fogDensityB = 0.00005f;
 float erosionScale =0.0f;
 bool shadow = false;
 float tessLevel = 32;
+unsigned int rez = 20;
+int rezInput = (int)rez;
 
 glm::vec3 lightDir = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 int main() {
@@ -95,7 +97,6 @@ int main() {
                        "../src/shaders/terrain.tes");
 
   float terrainSize = terrainSizeInput;
-  unsigned rez = 20;
   unsigned int terrainVAO, terrainVBO;
   glGenVertexArrays(1, &terrainVAO);
   glBindVertexArray(terrainVAO);
@@ -157,9 +158,11 @@ int main() {
     
     if (ImGui::Button("Generate Terrain")) {
       terrainSize = terrainSizeInput;
+      rez = rezInput; 
       generateTerrain(terrainVBO, terrainSize, rez);
     }
 
+    ImGui::SliderInt("Terrain Resolution", &rezInput, 20, 64);
     ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 20000.0f);
     ImGui::SliderFloat("Tesselation level", &tessLevel, 16.0f, 64.0f);
     ImGui::Separator();
