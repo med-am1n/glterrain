@@ -162,6 +162,7 @@ int main() {
       generateTerrain(terrainVBO, terrainSize, rez);
     }
 
+    ImGui::Text("Total Vertices: %lld", (long long)rez * rez * ((int)tessLevel + 1) * ((int)tessLevel + 1));
     ImGui::SliderInt("Terrain Resolution", &rezInput, 20, 64);
     ImGui::SliderFloat("Terrain Size", &terrainSizeInput, 10.0f, 20000.0f);
     ImGui::SliderFloat("Tesselation level", &tessLevel, 16.0f, 64.0f);
