@@ -185,12 +185,9 @@ int main() {
     ImGui::Combo("Visualization", &visualizationMode, modes,
                  IM_ARRAYSIZE(modes));
     
-    if (visualizationMode == 3){
-      ImGui::SliderInt("Softness", &softness, 1, 15);
-      ImGui::SliderInt("Delta", &delta, 1, 10);
-    }
 
-    if (visualizationMode == 3 || visualizationMode == 2){
+
+    if (visualizationMode == 2){
     
       ImGui::Separator();
       ImGui::Checkbox("Fog Effect", &fog); 
