@@ -93,14 +93,14 @@ const mat2 m2i = mat2(
 );
 
 
-float terrainHeight(vec2 x)
+float terrainHeight(vec2 x, int octaves)
 {
     float value = 0.0;
     float amplitude = 1.0;
 
     vec2 d = vec2(0.0);
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < octaves; i++)
     {
         vec3 n = noised(x);
 
@@ -117,6 +117,11 @@ float terrainHeight(vec2 x)
     return value;
 }
 
+// Default: 9 octaves
+float terrainHeight(vec2 x)
+{
+    return terrainHeight(x, 9);
+}
 
 float getTerrainHeight(vec2 p)
 {
