@@ -11,8 +11,6 @@ in float Shadow;
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
-uniform sampler2D texture_diffuse3;
-uniform sampler2D texture_diffuse4;
 
 out vec4 FragColor;
 
@@ -84,12 +82,12 @@ void main()
     {
         vec2 uv = Tex * gTextureScale;
         
-        vec3 color3 = textureNoTile(texture_diffuse4, uv).rgb;
-        vec3 color4 = textureNoTile(texture_diffuse4, uv).rgb;
+        vec3 color1 = textureNoTile(texture_diffuse1, uv).rgb;
+        vec3 color2 = textureNoTile(texture_diffuse2, uv).rgb;
 
         float heightBlend = smoothstep(500.0, 700.0, Height);
 
-        vec3 flatColor = mix(color3, color4, heightBlend);
+        vec3 flatColor = mix(color1, color2, heightBlend);
 
         vec3 steepColor = textureNoTile(texture_diffuse0, uv).rgb;
         

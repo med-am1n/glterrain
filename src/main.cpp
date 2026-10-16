@@ -115,10 +115,8 @@ int main() {
 
     std::vector<std::string> materialDirs = {
         "../resources/textures/dirt/",
-        "../resources/textures/rock/",
         "../resources/textures/grass/",
-        "../resources/textures/snow1/",
-        "../resources/textures/snow2/"
+        "../resources/textures/snow/",
     };
     const int materialCount = materialDirs.size();
     unsigned int heightTextures[materialCount];
@@ -137,7 +135,7 @@ int main() {
 
     terrainShader.use();
     for (int i = 0; i < materialCount; i++) { 
-      terrainShader.setInt("texture_diffuse" + std::to_string(i), 0 + i); 
+      terrainShader.setInt("texture_diffuse" + std::to_string(i), i); 
       //terrainShader.setInt("texture_specular" + std::to_string(i), + 5 + i); 
     }
 
