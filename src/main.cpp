@@ -92,9 +92,8 @@ int main() {
   ImGui_ImplOpenGL3_Init("#version 410");
 
   // build and compile the shader program
-  Shader terrainShader("../src/shaders/terrain.vs", "../src/shaders/terrain.fs",
-                       nullptr, "../src/shaders/terrain.tcs",
-                       "../src/shaders/terrain.tes");
+  Shader terrainShader((std::string(logl_root) + "/src/shaders/terrain.vs").c_str(), (std::string(logl_root) + "/src/shaders/terrain.fs").c_str(),
+                       nullptr, (std::string(logl_root) + "/src/shaders/terrain.tcs").c_str(), (std::string(logl_root) + "/src/shaders/terrain.tes").c_str());
 
   float terrainSize = terrainSizeInput;
   unsigned int terrainVAO, terrainVBO;
@@ -115,9 +114,9 @@ int main() {
   glEnable(GL_DEPTH_TEST);
 
     std::vector<std::string> materialDirs = {
-        "../resources/textures/dirt/",
-        "../resources/textures/grass/",
-        "../resources/textures/snow/",
+        (std::string(logl_root) +"/resources/textures/dirt/").c_str(),
+        (std::string(logl_root) +"/resources/textures/grass/").c_str(),
+        (std::string(logl_root) +"/resources/textures/snow/").c_str(),
     };
     const int materialCount = materialDirs.size();
     unsigned int heightTextures[materialCount];
