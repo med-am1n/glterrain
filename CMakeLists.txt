@@ -45,14 +45,14 @@ if(NOT EXISTS "${GLAD_SOURCE}")
     )
 endif()
 
-add_executable(prog
+add_executable(app
     src/main.cpp
     src/stb_image.cpp
     ${GLAD_SOURCE}
     ${IMGUI_SOURCES}
 )
 
-target_include_directories(prog PRIVATE
+target_include_directories(app PRIVATE
     ${GLAD_INCLUDE_DIR}
     external/glm
     external/imgui
@@ -60,7 +60,7 @@ target_include_directories(prog PRIVATE
     ${CMAKE_BINARY_DIR}/generated   
 )
 
-target_link_libraries(prog
+target_link_libraries(app
     glfw
     assimp::assimp
     "-framework OpenGL"
