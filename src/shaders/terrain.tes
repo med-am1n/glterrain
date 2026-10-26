@@ -117,19 +117,18 @@ float terrainHeight(vec2 x, int octaves)
     return value;
 }
 
-// Default: 9 octaves
-float terrainHeight(vec2 x)
+float getTerrainHeight(vec2 p, int octaves)
 {
-    return terrainHeight(x, 9);
+    vec2 noisePos = (p + terrainSize * 0.5) / noiseScale;
+
+    float e = terrainHeight(noisePos, octaves);
+
+    return heightScale * e + heightOffset;
 }
 
 float getTerrainHeight(vec2 p)
 {
-    vec2 noisePos = (p + terrainSize * 0.5) / noiseScale;
-
-    float e = terrainHeight(noisePos);
-
-    return heightScale * e + heightOffset;
+  return getTerrainHeight(p, 9);
 }
 
 vec3 calcTerrainNormal(vec4 p)
