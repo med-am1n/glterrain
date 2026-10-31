@@ -1,4 +1,4 @@
-# Tessellation
+# glterrain
 
 ## Dependencies
     - OpenGL APIs: gl:core=3.3
@@ -24,8 +24,6 @@ git submodule update --init --recursive
 ### 3. Build and Run
 Configure the project with CMake, compile, and run the executable:
 ```bash
-cmake -S . -B build/
-cd build
-make && ./prog
+make run
 ```
 ## Usage
