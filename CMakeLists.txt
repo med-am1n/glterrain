@@ -30,16 +30,7 @@ target_include_directories(app PRIVATE
     ${CMAKE_BINARY_DIR}/generated   
 )
 
-list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 find_package(glfw3 REQUIRED)
-find_package(assimp REQUIRED)
+find_package(OpenGL REQUIRED)
 
-target_link_libraries(app
-    glfw
-    assimp::assimp
-    "-framework OpenGL"
-    "-framework Cocoa"
-    "-framework IOKit"
-    "-framework CoreVideo"
-)
-
+target_link_libraries(app PRIVATE glfw OpenGL::GL)
