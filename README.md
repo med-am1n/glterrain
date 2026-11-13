@@ -1,8 +1,12 @@
 # glterrain
 
+OpenGL procedural terrain generation demo 
+
+![demo](./demo.png)
+
 ## Dependencies
-    - OpenGL APIs: gl:core=3.3
-    - glad 2.0.8
+    - OpenGL APIs: gl:core=4.1
+    - glad 4.1
     - C++17
 
 ## Getting Started
